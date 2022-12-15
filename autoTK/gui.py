@@ -9,8 +9,6 @@ class Screen:
     def __init__(self,win,gui):
         self.win = win
         self.gui = gui
-    def show(self):
-        ...
 
     def destroy(self):
         for child in self.win.winfo_children():
@@ -20,16 +18,17 @@ class StartScreen(Screen):
     def __init__(self,win,gui):
         super().__init__(win,gui)
         self.headline = tk.Label(self.win,text="WELCOME TO TKINTER DESIGNER",font="none 20 bold")
-        self.canvas = tk.Canvas(self.win,width=50,height=50,bg="lightblue",border=0)
+        self.canvas = tk.Canvas(self.win,width=100,height=100,bg="lightblue",border=0)
 
         self.canvas.bind("<Enter>",self.canvas_enter)
         self.canvas.bind("<Leave>", self.canvas_leave)
         self.create_btn = tk.Button(self.canvas,text="create",command=self._create)
-        self.entry_name = tk.Entry(self.canvas,width=50)
+        self.entry_name = tk.Entry(self.canvas,width=30)
         self.label_on_canvas = tk.Label(self.canvas, text="NEW")
+        self.label_info = tk.Label(self.canvas, text="Enter file name:",bg="lightblue")
         self.headline.pack()
-        self.canvas.pack()
-        self.label_on_canvas.pack()
+        self.canvas.pack(pady=100)
+        self.label_on_canvas.pack(pady=5)
 
     def _create(self):
         self.gui.add_builder(self.entry_name.get())
@@ -38,12 +37,19 @@ class StartScreen(Screen):
 
 
     def canvas_enter(self,e):
-        self.canvas.config(width=500, height=500,bg="lightblue",border=0)
-        self.create_btn.pack()
-        self.entry_name.pack()
+        self.canvas.config(width=1000, height=1000,bg="lightblue",border=0)
+
+        self.label_on_canvas.config(bg="lightblue",width=100)
+        self.label_info.pack(pady=20)
+        self.entry_name.pack(pady=20)
+        self.create_btn.pack(pady=20)
+
 
     def canvas_leave(self,e):
-        self.canvas.config(width=50,height=50)
+        self.label_on_canvas.config(bg="white",width=3)
+        self.canvas.config(width=100,height=100)
+
+        self.label_info.forget()
         self.create_btn.forget()
         self.entry_name.forget()
 
@@ -56,30 +62,52 @@ class RenderEditor(Screen):
         # master window
         self.win = win
 
-
-        # top bar
-        self.top_bar = tk.Canvas(self.win, height=100, width=400, bg="lightblue")
-
-
         # actual rendering window
-        self.second_win = tk.Frame(self.win, height=700, width=700, bg="grey")
+        self.second_win = tk.Frame(self.win, height=500, width=500, bg="grey")
 
         self.second_win.pack_propagate(False)
         self.placer = Placer(self.second_win)
+        # widgets layer
+        self.w_canvas = tk.Canvas(self.win, width=50, height=50,bg="red")
 
-        # tools
+        self.w_canvas.bind("<Enter>", self.show_widgets_layer)
+        self.w_canvas.bind("<Leave>", self.hide_widgets_layer)
+        self.w_label_canvas = tk.Label(self.w_canvas, text="+", font="none 20 bold",width=1, height=1,bg="red")
+        self.w_btn = tk.Button(self.w_canvas, text="button",command=lambda:self.add(WTypes.BUTTON))
+        self.w_label = tk.Button(self.w_canvas, text="label", command=lambda:self.add(WTypes.LABEL))
+        self.w_canvas.pack()
+        self.w_label_canvas.pack()
 
-
-        self.btn = tk.Button(self.top_bar, text="add",
-                             command=lambda: self.placer.add_widget(WTypes.BUTTON))
-
-        self.top_bar.pack()
-        self.second_win.pack(pady=50)
-        self.btn.place(y=0, x=0)
-        tk.Button(self.top_bar, text="add l",
-                  command=lambda: self.placer.add_widget(WTypes.LABEL)).place(x=0, y=30)
+        # top bar
+        self.top_bar = tk.Canvas(self.win, height=100, width=400, bg="lightblue")
+        self.txt_choosen_name = tk.Label(self.top_bar)
         tk.Button(self.top_bar, text="save",
                   command=self.save).place(x=50, y=30)
+        self.txt_choosen_name.place(x=0,y=0)
+
+        # tools
+        self.top_bar.pack()
+        self.second_win.pack(pady=50)
+
+
+
+
+
+    def add(self,type_):
+        self.placer.add_widget(type_)
+        self.txt_choosen_name.config(text=self.placer.choosen_name)
+
+
+    def show_widgets_layer(self,e):
+        self.w_label_canvas.config(width=20,height=2,bg="red")
+        self.w_canvas.config(width=500,height=500)
+        self.w_btn.place(x=70,y=20)
+        self.w_label.place(x=20,y=20)
+
+    def hide_widgets_layer(self,e):
+        self.w_label_canvas.config(width=1, height=1)
+        self.w_canvas.config(width=1, height=1)
+        self.w_btn.forget()
 
     def save(self):
         self.gui.builder.build(*self.placer.widgets.values())
@@ -91,7 +119,7 @@ class GUI:
     def __init__(self,win):
         win.geometry("1000x1000")
         self.temp = None
-        self.screen = StartScreen(win,self)
+        self.screen = RenderEditor(win,self)
 
         self.builder =None
 

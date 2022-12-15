@@ -16,6 +16,7 @@ class Placer:
         self.capture(False)
         self.do_capture = False
         self.choosen = None
+
         self.widgets = {}
 
     def add_widget(self,type_):
@@ -29,11 +30,12 @@ class Placer:
             wid.pack()
             w = WButton.create_widget("w_" + str(len(self.widgets)),
                                   "self.win",wid,self.set_choosen)
-
+        self.choosen_name = w.name
         self.widgets[w.name] = w
 
     def set_choosen(self,wid):
         self.choosen = wid
+
 
     def motion(self,event):
         if self.do_capture and self.choosen:
