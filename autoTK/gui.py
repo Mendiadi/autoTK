@@ -75,6 +75,7 @@ class RenderEditor(Screen):
         self.w_canvas.bind("<Enter>", self.show_widgets_layer)
         self.w_canvas.bind("<Leave>", self.hide_widgets_layer)
         self.w_label_canvas = tk.Label(self.w_canvas, text="+", font="none 20 bold",width=1, height=1,bg="red")
+        self.w_entry_name = tk.Entry(self.w_canvas,width=20)
         self.w_btn = tk.Button(self.w_canvas, text="button",command=lambda:self.add(WTypes.BUTTON))
         self.w_label = tk.Button(self.w_canvas, text="label", command=lambda:self.add(WTypes.LABEL))
         self.w_canvas.pack()
@@ -101,19 +102,29 @@ class RenderEditor(Screen):
         while self.active:
             time.sleep(0.5)
             selected = self.list_box.get(tk.ANCHOR)
-            if self.placer.choosen_name != selected and selected:
+            if not selected:
+                wid = self.placer.get_widget(self.placer.choosen_name)
+                if not wid:
+                    continue
+                self.list_box.selection_clear(0, tk.END)
+                self.list_box.select_set(wid.index)
+                continue
+            if self.placer.choosen_name != selected:
 
                 if not self.placer.force_select:
+                    print("moshe")
                     self.placer.choosen_name = selected
                     self.placer.choosen = self.placer.get_widget(selected).widget
                 else:
-                    self.list_box.selection_clear(0,tk.END)
-                    self.list_box.select_set(int(self.placer.choosen_name[-1]))
+
+                    self.list_box.selection_clear(0, tk.END)
+                    self.list_box.select_set(self.placer.get_widget(self.placer.choosen_name).index)
+                    self.list_box.select_anchor(self.placer.get_widget(self.placer.choosen_name).index)
             self.txt_choosen_name.config(text=self.placer.choosen_name)
 
 
     def add(self,type_):
-        self.placer.add_widget(type_)
+        self.placer.add_widget(type_,self.w_entry_name.get())
         self.list_box.insert(tk.END,self.placer.choosen_name)
 
 
@@ -122,11 +133,13 @@ class RenderEditor(Screen):
         self.w_canvas.config(width=500,height=500)
         self.w_btn.place(x=70,y=20)
         self.w_label.place(x=20,y=20)
+        self.w_entry_name.place(x=70,y=0)
 
     def hide_widgets_layer(self,e):
         self.w_label_canvas.config(width=1, height=1)
         self.w_canvas.config(width=1, height=1)
         self.w_btn.forget()
+        self.w_entry_name.forget()
 
     def save(self):
         self.gui.builder.build(*self.placer.widgets.values())

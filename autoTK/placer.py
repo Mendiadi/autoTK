@@ -19,24 +19,29 @@ class Placer:
         self.choosen_name = None
         self.widgets = {}
         self.force_select = False
+        self.amounts = 0
 
 
     def get_widget(self,name):
-        return self.widgets[name]
+        wid = self.widgets.get(name,None)
+        return wid
 
-    def add_widget(self,type_):
+    def add_widget(self,type_,name):
         if type_.value == WTypes.LABEL.value:
             wid = tk.Label(self.root, text="test")
             wid.pack()
-            w = WLabel.create_widget("w_" + str(len(self.widgets)),
+            w = WLabel.create_widget(name,
                                       "self.win", wid, self.set_choosen)
         elif type_.value == WTypes.BUTTON.value:
             wid = tk.Button(self.root,text="test")
             wid.pack()
-            w = WButton.create_widget("w_" + str(len(self.widgets)),
+            w = WButton.create_widget(name,
                                   "self.win",wid,self.set_choosen)
+
         self.choosen_name = w.name
         self.widgets[w.name] = w
+        w.index = self.amounts
+        self.amounts += 1
 
     def set_choosen(self,wid):
         self.force_select = True

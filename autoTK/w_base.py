@@ -10,6 +10,7 @@ class WBase:
         self.name = name
         self.widget = widget
         self.parent = parent
+        self.index = None
 
     def generate_code_for_widget(self):
         ...
