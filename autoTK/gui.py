@@ -1,3 +1,5 @@
+import threading
+import time
 import tkinter as tk
 
 
@@ -85,17 +87,34 @@ class RenderEditor(Screen):
                   command=self.save).place(x=50, y=30)
         self.txt_choosen_name.place(x=0,y=0)
 
+        # list box
+        self.list_box = tk.Listbox(self.win)
+        self.list_box.place(x=10,y=300)
+
         # tools
         self.top_bar.pack()
         self.second_win.pack(pady=50)
+        self.active = True
+        threading.Thread(target=self._thread_update_chosen,daemon=True).start()
 
+    def _thread_update_chosen(self):
+        while self.active:
+            time.sleep(0.5)
+            selected = self.list_box.get(tk.ANCHOR)
+            if self.placer.choosen_name != selected and selected:
 
-
+                if not self.placer.force_select:
+                    self.placer.choosen_name = selected
+                    self.placer.choosen = self.placer.get_widget(selected).widget
+                else:
+                    self.list_box.selection_clear(0,tk.END)
+                    self.list_box.select_set(int(self.placer.choosen_name[-1]))
+            self.txt_choosen_name.config(text=self.placer.choosen_name)
 
 
     def add(self,type_):
         self.placer.add_widget(type_)
-        self.txt_choosen_name.config(text=self.placer.choosen_name)
+        self.list_box.insert(tk.END,self.placer.choosen_name)
 
 
     def show_widgets_layer(self,e):

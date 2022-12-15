@@ -16,8 +16,13 @@ class Placer:
         self.capture(False)
         self.do_capture = False
         self.choosen = None
-
+        self.choosen_name = None
         self.widgets = {}
+        self.force_select = False
+
+
+    def get_widget(self,name):
+        return self.widgets[name]
 
     def add_widget(self,type_):
         if type_.value == WTypes.LABEL.value:
@@ -34,8 +39,9 @@ class Placer:
         self.widgets[w.name] = w
 
     def set_choosen(self,wid):
-        self.choosen = wid
-
+        self.force_select = True
+        self.choosen = wid.widget
+        self.choosen_name = wid.name
 
     def motion(self,event):
         if self.do_capture and self.choosen:
@@ -43,9 +49,8 @@ class Placer:
             self.choosen.place_configure(x=x, y=y)
 
 
-
-
-
     def capture(self,flag):
         self.do_capture = flag
+        if not flag:
+            self.force_select = False
 

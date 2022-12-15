@@ -16,9 +16,9 @@ class WBase:
 
     @classmethod
     def create_widget(cls,name,parent,widget,func):
-
-        widget.bind("<Button-1>",lambda x: func(widget))
-        return cls(name,parent,widget)
+        instance = cls(name,parent,widget)
+        widget.bind("<Button-1>", lambda x: func(instance))
+        return instance
 
     def get_place(self):
         return f"self.{self.name}.place(x={self.widget.winfo_x()},y={self.widget.winfo_y()})"
