@@ -28,15 +28,17 @@ class Placer:
 
     def add_widget(self,type_,name):
         if type_.value == WTypes.LABEL.value:
-            wid = tk.Label(self.root, text="test")
+            wid = tk.Label(self.root)
             wid.pack()
             w = WLabel.create_widget(name,
                                       "self.win", wid, self.set_choosen)
         elif type_.value == WTypes.BUTTON.value:
-            wid = tk.Button(self.root,text="test")
+            wid = tk.Button(self.root)
             wid.pack()
             w = WButton.create_widget(name,
                                   "self.win",wid,self.set_choosen)
+        w.set_conf(text="sample")
+        w.update()
 
         self.choosen_name = w.name
         self.widgets[w.name] = w

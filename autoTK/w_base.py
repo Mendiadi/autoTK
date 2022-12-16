@@ -1,5 +1,8 @@
 from enum import Enum
 
+from autoTK.options import Options
+
+
 class WTypes(Enum):
     BUTTON = 1
     LABEL = 0
@@ -11,6 +14,15 @@ class WBase:
         self.widget = widget
         self.parent = parent
         self.index = None
+
+    def update(self):
+        print(self.conf.options)
+        if self.conf._args_supported(self.conf.options):
+
+            self.widget.config(**self.conf.options)
+
+    def set_conf(self, **options):
+        self.conf = Options(**options)
 
     def generate_code_for_widget(self):
         ...
