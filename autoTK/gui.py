@@ -76,6 +76,7 @@ class RenderEditor(Screen):
         self.w_entry_name = tk.Entry(self.w_canvas, width=20)
         self.w_btn = tk.Button(self.w_canvas, text="button", command=lambda: self.add(WTypes.BUTTON))
         self.w_label = tk.Button(self.w_canvas, text="label", command=lambda: self.add(WTypes.LABEL))
+        self.w_name_label = tk.Label(self.w_canvas,text="Name: ",bg="red")
         self.w_canvas.pack()
         self.w_label_canvas.pack()
 
@@ -173,10 +174,12 @@ class RenderEditor(Screen):
         self.list_box.insert(tk.END, self.placer.choosen_name)
 
     def show_widgets_layer(self, e):
+        self.w_name_label.config(text="Name:")
         self.w_label_canvas.config(width=20, height=2, bg="red")
         self.w_canvas.config(width=500, height=500)
         self.w_btn.place(x=70, y=20)
         self.w_label.place(x=20, y=20)
+        self.w_name_label.place(x=0,y=0)
         self.w_entry_name.place(x=70, y=0)
 
     def hide_widgets_layer(self, e):
@@ -185,6 +188,8 @@ class RenderEditor(Screen):
         self.w_btn.forget()
         self.w_entry_name.delete(0,tk.END)
         self.w_entry_name.forget()
+        self.w_name_label.config(text="")
+        self.w_name_label.forget()
 
 
     def save(self):
