@@ -114,10 +114,10 @@ class RenderEditor(Screen):
 
     def update_widget_options(self,e,entry,supported):
         print("moshe")
-
+        if self.placer.amounts < 1:
+            return
         self.in_updating_options = True
         wid = self.placer.get_widget(self.placer.choosen_name)
-
         wid.conf.options[supported] = entry.get()
         print(wid.conf.options,supported)
         wid.update()
@@ -128,9 +128,11 @@ class RenderEditor(Screen):
             return
         op = self.placer.get_widget(self.placer.choosen_name).conf.options
         temp = dict(op)
+        for entry in self.options_entries.values():
+            entry.delete(0,tk.END)
         for option,value in temp.items():
+
             e = self.options_entries[option]
-            e.delete(0,tk.END)
             e.insert(0,value)
 
 
@@ -165,6 +167,7 @@ class RenderEditor(Screen):
 
 
 
+
     def add(self, type_):
         self.placer.add_widget(type_, self.w_entry_name.get())
         self.list_box.insert(tk.END, self.placer.choosen_name)
@@ -180,7 +183,9 @@ class RenderEditor(Screen):
         self.w_label_canvas.config(width=1, height=1)
         self.w_canvas.config(width=1, height=1)
         self.w_btn.forget()
+        self.w_entry_name.delete(0,tk.END)
         self.w_entry_name.forget()
+
 
     def save(self):
         self.gui.builder.build(*self.placer.widgets.values())
