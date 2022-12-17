@@ -1,14 +1,20 @@
 import os
 
+from autoTK.w_button import WButton
 from converter import Converter
 from analizer import Analizer
 
 class Builder:
     def __init__(self,name,size):
+        self.name = name
+        self.size = size
         self.scanner = None
-        self.converter = Converter(name,size)
+        self.converter = None
 
     def build(self,*widgets):
+        self.converter = Converter(self.name,self.size,[
+            w for w in widgets if type(w) == WButton and w.onclick_template
+        ])
         self.scanner = Analizer(*widgets)
         self._prepare_file()
 

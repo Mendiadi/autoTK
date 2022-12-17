@@ -3,6 +3,7 @@ import time
 import tkinter as tk
 
 from autoTK.options import Options
+from autoTK.w_button import WButton
 from placer import Placer
 from builder import Builder
 from w_base import WTypes
@@ -72,11 +73,7 @@ class RenderEditor(Screen):
         super().__init__(win, gui)
         # master window
         self.win = win
-        if height + 150 < 500:
-            height = 500
-        if width + 350 < 700:
-            width = 700
-        self.win.geometry(f"{width + 350}x{height + 150}")
+
         # actual rendering window
 
         self.second_win = tk.Frame(self.win, height=height, width=width, bg="grey")
@@ -135,8 +132,16 @@ class RenderEditor(Screen):
                                                        offvalue=0, onvalue=1,
                                                             bg="lightblue",border=0,activebackground="lightblue",
                                                             selectcolor="grey")
+        self.add_onclick_template_var = tk.IntVar()
+        self.add_onclick_template_btn = tk.Checkbutton(self.top_bar,
+                                                       text="add onclick template",
+                                                       variable=self.add_onclick_template_var,
+                                                       offvalue=0, onvalue=1,
+                                                       bg="lightblue", border=0, activebackground="lightblue",
+                                                       selectcolor="grey")
         self.multi_selected_check_btn.place(x=500,y=90)
         self.enable_auto_correct_check_btn.place(x=50,y=90)
+
         # list box
         self.list_box = tk.Listbox(self.win)
         self.list_box.place(x=10, y=300)
@@ -166,14 +171,19 @@ class RenderEditor(Screen):
     def update_top_bar(self):
         if self.in_updating_options:
             return
-        op = self.placer.get_widget(self.placer.choosen_name).conf.options
-        temp = dict(op)
+        op = self.placer.get_widget(self.placer.choosen_name)
+        temp = dict(op.conf.options)
         for entry in self.options_entries.values():
             entry.delete(0,tk.END)
         for option,value in temp.items():
 
             e = self.options_entries[option]
             e.insert(0,value)
+        if type(op) == WButton:
+            self.add_onclick_template_btn.place(x=10, y=70)
+            self.add_onclick_template_var.set(op.onclick_template)
+        else:
+            self.add_onclick_template_btn.place_forget()
 
 
     def select_widget(self,wid):
@@ -187,6 +197,13 @@ class RenderEditor(Screen):
     def _thread_update_chosen(self):
         pos = ""
         while self.active:
+            if type(self.placer.choosen) == tk.Button:
+                if self.add_onclick_template_var.get() == 1:
+                    print("yes")
+                    self.placer.get_widget(self.placer.choosen_name).onclick_template = True
+                else:
+                    print("no")
+                    self.placer.get_widget(self.placer.choosen_name).onclick_template = False
             if self.enable_auto_correct_check_var.get() == 1:
                 self.placer.is_auto_correct_enabled = True
             else:
@@ -276,6 +293,11 @@ class GUI:
 
     def move_to_editor(self,h,w):
         self.screen.destroy()
+        if int(h) + 450 < 300:
+            h = 500
+        if int(w) + 400 < 500:
+            w = 700
+        self.screen.win.geometry(f"{int(w) + 400}x{int(h) + 450}")
         self.temp = RenderEditor(self.screen.win, self,int(h),int(w))
 
 
