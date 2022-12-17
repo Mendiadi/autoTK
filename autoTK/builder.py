@@ -4,9 +4,9 @@ from converter import Converter
 from analizer import Analizer
 
 class Builder:
-    def __init__(self,name):
+    def __init__(self,name,size):
         self.scanner = None
-        self.converter = Converter(name)
+        self.converter = Converter(name,size)
 
     def build(self,*widgets):
         self.scanner = Analizer(*widgets)

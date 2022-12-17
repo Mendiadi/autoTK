@@ -2,8 +2,8 @@ import datetime
 
 
 class Converter:
-    def __init__(self,classname):
-        self.structure = {"size":"700x700"}
+    def __init__(self,classname,size):
+        self.structure = {"size":size}
         self.name = classname
 
     def _get_descriptions(self):
@@ -12,7 +12,7 @@ class Converter:
     def _get_main_template(self):
         return f"if __name__ == '__main__':\n\t" \
                f"root = tk.Tk()\n\t" \
-               f"gui = {self.name}(root)\n\t" \
+               f"gui = {self.name.capitalize()}(root)\n\t" \
                f"root.geometry('{self.structure['size']}')" \
                f"\n\tgui.load()\n\troot.mainloop()"
 

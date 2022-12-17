@@ -16,6 +16,7 @@ class WBase:
         self.parent = parent
         self.index = None
 
+
     def update(self):
         print(self.conf.options)
         if self.conf._args_supported(self.conf.options):

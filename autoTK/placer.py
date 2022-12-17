@@ -26,6 +26,7 @@ class Placer:
         self.in_motion = False
         self.in_multiple_selection = False
         self.selected_multi_list = set()
+        self.is_auto_correct_enabled = False
 
     def get_widget(self,name):
         wid = self.widgets.get(name,None)
@@ -74,6 +75,7 @@ class Placer:
                 list_box.delete(w.index,w.index)
                 self.amounts -= 1
             m_list_box.delete(0,tk.END)
+            self.selected_multi_list.clear()
         else:
             w = self.widgets.get(self.choosen_name,None)
             if not w:
@@ -91,17 +93,18 @@ class Placer:
             x, y = event.x, event.y
             self.choosen.place_configure(x=x, y=y)
             if not self.in_multiple_selection:
-                self.detect_horizontal_points()
-                self.detect_vertical_points()
+                if self.is_auto_correct_enabled:
+                    self.detect_horizontal_points()
+                    self.detect_vertical_points()
             else:
                 if not self.selected_multi_list:
                     return
 
-        print(threading.activeCount())
+        print(threading.activeCount(),len(self.selected_multi_list))
 
     def detect_vertical_points(self):
         canvases = []
-        def clear():
+        def clear(w):
             [c_.destroy() for c_ in canvases]
             self.choosen.place_configure(y=w.widget.winfo_y())
             canvases.clear()
@@ -127,14 +130,14 @@ class Placer:
                     else:
                         c.place(y=src_, x=self.choosen.winfo_x())
                     self.memorize_detect.add((self.choosen, w))
-                    threading.Timer(0.5, clear).start()
+                    threading.Timer(0.5, lambda:clear(w)).start()
 
                     break
 
     def detect_horizontal_points(self):
 
         canvases = []
-        def clear():
+        def clear(w):
             [c_.destroy() for c_ in canvases]
             if not self.in_motion:
                 self.choosen.place_configure(x=w.widget.winfo_x())
@@ -163,7 +166,7 @@ class Placer:
                     else:
                         c.place(x=src_, y=self.choosen.winfo_y())
                     self.memorize_detect.add((self.choosen,w))
-                    threading.Timer(0.5,clear).start()
+                    threading.Timer(0.5,lambda:clear(w)).start()
 
                     break
 

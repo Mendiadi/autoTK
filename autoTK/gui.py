@@ -30,44 +30,62 @@ class StartScreen(Screen):
         self.entry_name = tk.Entry(self.canvas, width=30)
         self.label_on_canvas = tk.Label(self.canvas, text="NEW")
         self.label_info = tk.Label(self.canvas, text="Enter file name:", bg="lightblue")
+        self.entry_width =  tk.Entry(self.canvas, width=10)
+        self.label_info_width = tk.Label(self.canvas, text="WIDTH: ", bg="lightblue")
+        self.entry_height = tk.Entry(self.canvas, width=10)
+        self.label_info_height = tk.Label(self.canvas, text="HEIGHT: ", bg="lightblue")
         self.headline.pack()
         self.canvas.pack(pady=100)
         self.label_on_canvas.pack(pady=5)
 
-    def _create(self):
-        self.gui.add_builder(self.entry_name.get())
 
-        self.gui.move_to_editor()
+    def _create(self):
+        height, width = self.entry_height.get(),self.entry_width.get()
+        self.gui.add_builder(self.entry_name.get(),f"{width}x{height}")
+        self.gui.move_to_editor(w=width,h=height)
 
     def canvas_enter(self, e):
         self.canvas.config(width=1000, height=1000, bg="lightblue", border=0)
 
         self.label_on_canvas.config(bg="lightblue", width=100)
-        self.label_info.pack(pady=20)
-        self.entry_name.pack(pady=20)
-        self.create_btn.pack(pady=20)
-
+        self.label_info.pack(pady=5)
+        self.entry_name.pack(pady=5)
+        self.create_btn.pack(pady=5)
+        self.label_info_width.pack(pady=5)
+        self.entry_width.pack(pady=5)
+        self.label_info_height.pack(pady=5)
+        self.entry_height.pack(pady=5)
     def canvas_leave(self, e):
         self.label_on_canvas.config(bg="white", width=3)
         self.canvas.config(width=100, height=100)
-
+        self.label_info_width.forget()
+        self.entry_width.forget()
+        self.label_info_height.forget()
+        self.entry_height.forget()
         self.label_info.forget()
         self.create_btn.forget()
         self.entry_name.forget()
 
 
 class RenderEditor(Screen):
-    def __init__(self, win, gui):
+    def __init__(self, win, gui,height,width):
         super().__init__(win, gui)
         # master window
         self.win = win
-
+        if height + 150 < 500:
+            height = 500
+        if width + 350 < 700:
+            width = 700
+        self.win.geometry(f"{width + 350}x{height + 150}")
         # actual rendering window
-        self.second_win = tk.Frame(self.win, height=500, width=500, bg="grey")
+
+        self.second_win = tk.Frame(self.win, height=height, width=width, bg="grey")
 
         self.second_win.pack_propagate(False)
         self.placer = Placer(self.second_win)
         # widgets layer
+
+        self.w_btns_widgets = []
         self.w_canvas = tk.Canvas(self.win, width=50, height=50, bg="red")
 
         self.w_canvas.bind("<Enter>", self.show_widgets_layer)
@@ -77,7 +95,7 @@ class RenderEditor(Screen):
         self.w_btn = tk.Button(self.w_canvas, text="button", command=lambda: self.add(WTypes.BUTTON))
         self.w_entry = tk.Button(self.w_canvas, text="entry", command=lambda: self.add(WTypes.ENTRY))
         self.w_label = tk.Button(self.w_canvas, text="label", command=lambda: self.add(WTypes.LABEL))
-        self.w_name_label = tk.Label(self.w_canvas,text="Name: ",bg="red")
+        self.w_name_label = tk.Label(self.w_canvas, text="Name: ", bg="red")
         self.w_canvas.pack()
         self.w_label_canvas.pack()
 
@@ -101,14 +119,24 @@ class RenderEditor(Screen):
             e.place(x=i * 100, y=30)
             self.options_entries[supported] = e
         self.txt_choosen_name.place(x=300, y=120)
-        self.duplicate_btn = tk.Button(self.top_bar,text="duplicate",command=self.duplicate_widget)
+        self.duplicate_btn = tk.Button(self.top_bar,text="clone",command=self.duplicate_widget)
         self.duplicate_btn.place(x=450,y=60)
         self.multi_selected_var = tk.IntVar()
         self.multi_selected_check_btn = tk.Checkbutton(self.top_bar,
                                                        text="multiple",
                                                        variable=self.multi_selected_var,
-                                                       offvalue=0,onvalue=1)
-        self.multi_selected_check_btn.place(x=500,y=100)
+                                                       offvalue=0,onvalue=1,
+                                                       bg="lightblue",border=0,activebackground="lightblue",
+                                                       selectcolor="grey")
+        self.enable_auto_correct_check_var = tk.IntVar()
+        self.enable_auto_correct_check_btn = tk.Checkbutton(self.top_bar,
+                                                       text="enable auto correct",
+                                                       variable=self.enable_auto_correct_check_var,
+                                                       offvalue=0, onvalue=1,
+                                                            bg="lightblue",border=0,activebackground="lightblue",
+                                                            selectcolor="grey")
+        self.multi_selected_check_btn.place(x=500,y=90)
+        self.enable_auto_correct_check_btn.place(x=50,y=90)
         # list box
         self.list_box = tk.Listbox(self.win)
         self.list_box.place(x=10, y=300)
@@ -123,7 +151,7 @@ class RenderEditor(Screen):
         threading.Thread(target=self._thread_update_chosen, daemon=True).start()
         self.in_updating_options = False
         self.temp_values = None
-
+        print(self.w_btns_widgets)
     def update_widget_options(self,e,entry,supported):
         print("moshe")
         if self.placer.amounts < 1:
@@ -159,6 +187,10 @@ class RenderEditor(Screen):
     def _thread_update_chosen(self):
         pos = ""
         while self.active:
+            if self.enable_auto_correct_check_var.get() == 1:
+                self.placer.is_auto_correct_enabled = True
+            else:
+                self.placer.is_auto_correct_enabled = False
             if self.multi_selected_var.get() == 1:
                 self.placer.in_multiple_selection = True
                 self.list_box_multi.place(x=800,y=300)
@@ -212,16 +244,15 @@ class RenderEditor(Screen):
         self.w_canvas.config(width=500, height=500)
         self.w_btn.place(x=70, y=20)
         self.w_label.place(x=20, y=20)
-        self.w_entry.place(x=120,y=20)
-        self.w_name_label.place(x=0,y=0)
+        self.w_entry.place(x=120, y=20)
+        self.w_name_label.place(x=0, y=0)
         self.w_entry_name.place(x=70, y=0)
-
 
     def hide_widgets_layer(self, e):
         self.w_label_canvas.config(width=1, height=1)
         self.w_canvas.config(width=1, height=1)
         self.w_btn.forget()
-        self.w_entry_name.delete(0,tk.END)
+        self.w_entry_name.delete(0, tk.END)
         self.w_entry_name.forget()
         self.w_name_label.config(text="")
         self.w_name_label.forget()
@@ -234,22 +265,23 @@ class RenderEditor(Screen):
 
 class GUI:
     def __init__(self, win):
-        win.geometry("1000x1000")
+        win.geometry("500x500")
         self.temp = None
         self.screen = StartScreen(win, self)
 
         self.builder = None
 
-    def add_builder(self, name):
-        self.builder = Builder(name)
+    def add_builder(self, name,size):
+        self.builder = Builder(name,size)
 
-    def move_to_editor(self):
+    def move_to_editor(self,h,w):
         self.screen.destroy()
-        self.temp = RenderEditor(self.screen.win, self)
+        self.temp = RenderEditor(self.screen.win, self,int(h),int(w))
 
 
 if __name__ == '__main__':
     root = tk.Tk()
+
     gui = GUI(root)
 
     root.mainloop()
