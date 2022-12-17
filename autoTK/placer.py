@@ -1,4 +1,3 @@
-
 import tkinter as tk
 
 import threading
@@ -10,9 +9,10 @@ from autoTK.w_label import WLabel
 
 
 class Parent:
-    def __init__(self,p,n):
+    def __init__(self, p, n):
         self.parent = p
         self.name = n
+
 
 class Placer:
     def __init__(self, root):
@@ -37,8 +37,8 @@ class Placer:
         wid = self.widgets.get(name, None)
         return wid
 
-    def add_widget(self, type_, name,parent=None):
-        parent__ = Parent(self.widgets[parent].widget,f"self.{parent}") if parent else Parent(self.root,"self.win")
+    def add_widget(self, type_, name, parent=None):
+        parent__ = Parent(self.widgets[parent].widget, f"self.{parent}") if parent else Parent(self.root, "self.win")
         if name in self.widgets:
             name = f"{name}_{self.amounts}"
         if type_.value == WTypes.LABEL.value:
@@ -77,7 +77,6 @@ class Placer:
             for w in self.selected_multi_list:
                 w.widget.destroy()
                 self.widgets.pop(w.name, 0)
-                list_box.delete(w.index, w.index)
                 self.amounts -= 1
             m_list_box.delete(0, tk.END)
             self.selected_multi_list.clear()
@@ -87,10 +86,17 @@ class Placer:
                 return
             self.choosen.destroy()
             self.widgets.pop(w.name, 0)
-            list_box.delete(w.index, w.index)
             self.amounts -= 1
-        self.choosen = None
-        self.choosen_name = None
+        list_box.delete(0, tk.END)
+        for i, widget in enumerate(self.widgets.values()):
+            list_box.insert(i, widget.name)
+        if len(self.widgets):
+            first_wid = list(self.widgets.values())[0]
+            print(first_wid.name,self.widgets,"^"*100)
+        else:
+            first_wid = None
+        self.choosen = first_wid.widget
+        self.choosen_name = first_wid.name if first_wid else None
 
     def motion(self, event):
         if self.do_capture and self.choosen:
@@ -163,7 +169,7 @@ class Placer:
 
                 if (src_ == w.widget.winfo_x() or src_ - 1 == w.widget.winfo_x() - 1
                     or src_ + 1 == w.widget.winfo_x() + 1
-                    ) and (self.choosen, w) not in self.memorize_detect:
+                ) and (self.choosen, w) not in self.memorize_detect:
 
                     c = tk.Canvas(self.root, width=0.1, height=abs(w.widget.winfo_y() - self.choosen.winfo_y()) + 5)
 

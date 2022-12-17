@@ -15,7 +15,7 @@ class WBase:
         self.name = name
         self.widget = widget
         self.parent = parent
-        self.index = None
+
 
     def update(self):
         print(self.conf.options)
