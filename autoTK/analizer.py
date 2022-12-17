@@ -1,7 +1,6 @@
 
-
 class Analizer:
-    def __init__(self,*widgets):
+    def __init__(self ,*widgets):
         self.widgets = widgets
 
 

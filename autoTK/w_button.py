@@ -1,9 +1,10 @@
 from autoTK.w_base import WBase, WTypes
-from options import Options
+
+
 
 class WButton(WBase):
-    def __init__(self,name,parent,widget):
-        super().__init__(name,parent,widget)
+    def __init__(self, name, parent, widget):
+        super().__init__(name, parent, widget)
         self.conf = None
         self.onclick_template = False
 
@@ -16,8 +17,5 @@ class WButton(WBase):
             self.conf.options["command"] = f"self.{self.name}_onclick"
         statement = \
             f"""self.{self.name} = tk.Button({self.parent},
-            {','.join([f'{k}="{v}"' if k != "command" else f'{k}={v}' for k, v in self.conf.options.items()])})"""
+            {','.join([f' {k}= "{v}"' if k != "command" else f' {k}= {v}' for k, v in self.conf.options.items()])})"""
         return statement
-
-
-
