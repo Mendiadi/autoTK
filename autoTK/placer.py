@@ -65,6 +65,26 @@ class Placer:
         else:
             self.selected_multi_list.add(wid)
 
+
+    def delete_selected(self,list_box,m_list_box):
+        if self.in_multiple_selection:
+            for w in self.selected_multi_list:
+                w.widget.destroy()
+                self.widgets.pop(w.name,0)
+                list_box.delete(w.index,w.index)
+                self.amounts -= 1
+            m_list_box.delete(0,tk.END)
+        else:
+            w = self.widgets.get(self.choosen_name,None)
+            if not w:
+                return
+            self.choosen.destroy()
+            self.widgets.pop(w.name, 0)
+            list_box.delete(w.index, w.index)
+            self.amounts -= 1
+        self.choosen = None
+        self.choosen_name = None
+
     def motion(self,event):
         if self.do_capture and self.choosen:
             self.in_motion = True
@@ -74,20 +94,9 @@ class Placer:
                 self.detect_horizontal_points()
                 self.detect_vertical_points()
             else:
-                for w in self.selected_multi_list:
-                    if x < w.widget.winfo_x():
-                        dest_x,dest_y = -1,0
-                    elif x > w.widget.winfo_x():
-                        dest_x ,dest_y = 1,0
-                    elif y > w.widget.winfo_y():
-                        dest_y,dest_x = 1,0
-                    elif y < w.widget.winfo_y():
-                        dest_y , dest_x =-1,0
-                    else:
-                        dest_x,dest_y = 0,0
+                if not self.selected_multi_list:
+                    return
 
-                    w.widget.place_configure(x=w.widget.winfo_x()+dest_x,
-                                             y=w.widget.winfo_y()+ dest_y)
         print(threading.activeCount())
 
     def detect_vertical_points(self):

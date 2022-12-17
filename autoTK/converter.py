@@ -18,7 +18,7 @@ class Converter:
 
     def _get_base_template(self):
         return "import tkinter as tk" \
-               f"\n\nclass {self.name}:\n" \
+               f"\n\nclass {self.name.capitalize()}:\n" \
                f"\tdef __init__(self,win):\n" \
                f"\t\tself.win = win\n\t\t"
 

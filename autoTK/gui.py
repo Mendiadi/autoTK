@@ -113,7 +113,9 @@ class RenderEditor(Screen):
         self.list_box = tk.Listbox(self.win)
         self.list_box.place(x=10, y=300)
         self.list_box_multi = tk.Listbox(self.win)
-
+        self.button_del_wid = tk.Button(self.win,text="delete",
+                                        command=lambda:self.placer.delete_selected(self.list_box,self.list_box_multi))
+        self.button_del_wid.place(x=10,y=700)
         # tools
         self.top_bar.pack()
         self.second_win.pack(pady=50)
@@ -147,6 +149,8 @@ class RenderEditor(Screen):
 
 
     def select_widget(self,wid):
+        if not wid:
+            return
         self.list_box.selection_clear(0, tk.END)
         self.list_box.select_set(wid.index)
         self.list_box.select_anchor(wid.index)
@@ -166,14 +170,14 @@ class RenderEditor(Screen):
                 time.sleep(0.5)
                 selected = self.list_box.get(tk.ANCHOR)
                 wid = self.placer.get_widget(self.placer.choosen_name)
+                if self.placer.choosen is None and self.placer.choosen_name is None:
+                    continue
                 if not selected:
-
                     if not wid:
                         continue
                     self.select_widget(wid)
-
-
                     continue
+
                 if self.placer.choosen_name != selected:
                     if not self.placer.force_select:
                         print("moshe")
@@ -181,12 +185,12 @@ class RenderEditor(Screen):
                         self.placer.choosen = self.placer.get_widget(selected).widget
 
                         self.update_top_bar()
-                        pos = f"   ( = {self.placer.choosen.winfo_x()},y = {self.placer.choosen.winfo_y()})"
+                        pos = f"   (x = {self.placer.choosen.winfo_x()},y = {self.placer.choosen.winfo_y()})"
                     else:
                         self.select_widget(wid)
 
                 if pos:
-                    pos = f"   ( = {self.placer.choosen.winfo_x()},y = {self.placer.choosen.winfo_y()})"
+                    pos = f"   (x = {self.placer.choosen.winfo_x()},y = {self.placer.choosen.winfo_y()})"
                 self.txt_choosen_name.config(text=self.placer.choosen_name + pos)
 
 
@@ -221,6 +225,7 @@ class RenderEditor(Screen):
         self.w_entry_name.forget()
         self.w_name_label.config(text="")
         self.w_name_label.forget()
+
 
 
     def save(self):
