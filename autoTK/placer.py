@@ -9,6 +9,11 @@ from autoTK.w_entry import WEntry
 from autoTK.w_label import WLabel
 
 
+class Parent:
+    def __init__(self,p,n):
+        self.parent = p
+        self.name = n
+
 class Placer:
     def __init__(self, root):
         self.root = root
@@ -32,23 +37,24 @@ class Placer:
         wid = self.widgets.get(name, None)
         return wid
 
-    def add_widget(self, type_, name):
+    def add_widget(self, type_, name,parent=None):
+        parent__ = Parent(self.widgets[parent].widget,f"self.{parent}") if parent else Parent(self.root,"self.win")
         if name in self.widgets:
             name = f"{name}_{self.amounts}"
         if type_.value == WTypes.LABEL.value:
-            wid = tk.Label(self.root)
+            wid = tk.Label(parent__.parent)
             wid.pack()
             w = WLabel.create_widget(name,
-                                     "self.win", wid, self.set_choosen)
+                                     parent__.name, wid, self.set_choosen)
         elif type_.value == WTypes.BUTTON.value:
-            wid = tk.Button(self.root)
+            wid = tk.Button(parent__.parent)
             wid.pack()
             w = WButton.create_widget(name,
-                                      "self.win", wid, self.set_choosen)
+                                      parent__.name, wid, self.set_choosen)
         elif type_.value == WTypes.ENTRY.value:
-            wid = tk.Entry(self.root)
+            wid = tk.Entry(parent__.parent)
             wid.pack()
-            w = WEntry.create_widget(name, "self.win", wid, self.set_choosen)
+            w = WEntry.create_widget(name, parent__.name, wid, self.set_choosen)
         w.set_conf(text="sample")
         w.update()
 
@@ -169,7 +175,6 @@ class Placer:
                         c.place(x=src_, y=self.choosen.winfo_y())
                     self.memorize_detect.add((self.choosen, w))
                     threading.Timer(0.5, lambda: clear(w)).start()
-
                     break
 
     def duplicate(self):
