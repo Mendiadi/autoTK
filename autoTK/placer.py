@@ -5,6 +5,7 @@ import threading
 
 from autoTK.w_base import WTypes
 from autoTK.w_button import WButton
+from autoTK.w_entry import WEntry
 from autoTK.w_label import WLabel
 
 
@@ -23,6 +24,8 @@ class Placer:
         self.amounts = 0
         self.memorize_detect = set()
         self.in_motion = False
+        self.in_multiple_selection = False
+        self.selected_multi_list = set()
 
     def get_widget(self,name):
         wid = self.widgets.get(name,None)
@@ -41,6 +44,10 @@ class Placer:
             wid.pack()
             w = WButton.create_widget(name,
                                   "self.win",wid,self.set_choosen)
+        elif type_.value == WTypes.ENTRY.value:
+            wid = tk.Entry(self.root)
+            wid.pack()
+            w = WEntry.create_widget(name,"self.win",wid,self.set_choosen)
         w.set_conf(text="sample")
         w.update()
 
@@ -50,18 +57,37 @@ class Placer:
         self.amounts += 1
 
     def set_choosen(self,wid):
-        self.force_select = True
-        self.choosen = wid.widget
-        self.choosen_name = wid.name
-        self.memorize_detect.clear()
+        if not self.in_multiple_selection:
+            self.force_select = True
+            self.choosen = wid.widget
+            self.choosen_name = wid.name
+            self.memorize_detect.clear()
+        else:
+            self.selected_multi_list.add(wid)
 
     def motion(self,event):
         if self.do_capture and self.choosen:
             self.in_motion = True
             x, y = event.x, event.y
             self.choosen.place_configure(x=x, y=y)
-            self.detect_horizontal_points()
-            self.detect_vertical_points()
+            if not self.in_multiple_selection:
+                self.detect_horizontal_points()
+                self.detect_vertical_points()
+            else:
+                for w in self.selected_multi_list:
+                    if x < w.widget.winfo_x():
+                        dest_x,dest_y = -1,0
+                    elif x > w.widget.winfo_x():
+                        dest_x ,dest_y = 1,0
+                    elif y > w.widget.winfo_y():
+                        dest_y,dest_x = 1,0
+                    elif y < w.widget.winfo_y():
+                        dest_y , dest_x =-1,0
+                    else:
+                        dest_x,dest_y = 0,0
+
+                    w.widget.place_configure(x=w.widget.winfo_x()+dest_x,
+                                             y=w.widget.winfo_y()+ dest_y)
         print(threading.activeCount())
 
     def detect_vertical_points(self):
@@ -93,7 +119,7 @@ class Placer:
                         c.place(y=src_, x=self.choosen.winfo_x())
                     self.memorize_detect.add((self.choosen, w))
                     threading.Timer(0.5, clear).start()
-                    # self.choosen.place_configure(y=w.widget.winfo_y())
+
                     break
 
     def detect_horizontal_points(self):
@@ -128,12 +154,17 @@ class Placer:
                     else:
                         c.place(x=src_, y=self.choosen.winfo_y())
                     self.memorize_detect.add((self.choosen,w))
-                    threading.Timer(0.2,clear).start()
-                    # self.choosen.place_configure(x=w.widget.winfo_x())
+                    threading.Timer(0.5,clear).start()
+
                     break
 
-
-
+    def duplicate(self):
+        temp = self.choosen_name
+        name = self.choosen_name + str(self.amounts)
+        self.add_widget(self.widgets[self.choosen_name].type,name)
+        self.widgets[name].set_conf(**self.widgets[temp].conf.options)
+        print(self.widgets[name].conf.options,"*"*200)
+        self.widgets[name].update()
     def capture(self,flag):
         self.do_capture = flag
         if not flag:

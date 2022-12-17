@@ -4,6 +4,7 @@ from autoTK.options import Options
 
 
 class WTypes(Enum):
+    ENTRY = 2
     BUTTON = 1
     LABEL = 0
 

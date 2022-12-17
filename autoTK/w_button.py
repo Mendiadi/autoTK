@@ -1,4 +1,4 @@
-from autoTK.w_base import WBase
+from autoTK.w_base import WBase, WTypes
 from options import Options
 
 class WButton(WBase):
@@ -7,8 +7,9 @@ class WButton(WBase):
         self.conf = None
 
 
-
-
+    @property
+    def type(self):
+        return WTypes.BUTTON
 
     def generate_code_for_widget(self) -> str:
 

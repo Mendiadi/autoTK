@@ -1,5 +1,5 @@
 from autoTK.options import Options
-from autoTK.w_base import WBase
+from autoTK.w_base import WBase, WTypes
 
 
 class WLabel(WBase):
@@ -8,6 +8,9 @@ class WLabel(WBase):
         self.conf = None
 
 
+    @property
+    def type(self):
+        return WTypes.LABEL
 
     def generate_code_for_widget(self) -> str:
         statement = \

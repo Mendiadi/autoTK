@@ -75,6 +75,7 @@ class RenderEditor(Screen):
         self.w_label_canvas = tk.Label(self.w_canvas, text="+", font="none 20 bold", width=1, height=1, bg="red")
         self.w_entry_name = tk.Entry(self.w_canvas, width=20)
         self.w_btn = tk.Button(self.w_canvas, text="button", command=lambda: self.add(WTypes.BUTTON))
+        self.w_entry = tk.Button(self.w_canvas, text="entry", command=lambda: self.add(WTypes.ENTRY))
         self.w_label = tk.Button(self.w_canvas, text="label", command=lambda: self.add(WTypes.LABEL))
         self.w_name_label = tk.Label(self.w_canvas,text="Name: ",bg="red")
         self.w_canvas.pack()
@@ -99,11 +100,19 @@ class RenderEditor(Screen):
 
             e.place(x=i * 100, y=30)
             self.options_entries[supported] = e
-        self.txt_choosen_name.place(x=300, y=0)
-
+        self.txt_choosen_name.place(x=300, y=120)
+        self.duplicate_btn = tk.Button(self.top_bar,text="duplicate",command=self.duplicate_widget)
+        self.duplicate_btn.place(x=450,y=60)
+        self.multi_selected_var = tk.IntVar()
+        self.multi_selected_check_btn = tk.Checkbutton(self.top_bar,
+                                                       text="multiple",
+                                                       variable=self.multi_selected_var,
+                                                       offvalue=0,onvalue=1)
+        self.multi_selected_check_btn.place(x=500,y=100)
         # list box
         self.list_box = tk.Listbox(self.win)
         self.list_box.place(x=10, y=300)
+        self.list_box_multi = tk.Listbox(self.win)
 
         # tools
         self.top_bar.pack()
@@ -144,33 +153,53 @@ class RenderEditor(Screen):
         self.update_top_bar()
 
     def _thread_update_chosen(self):
+        pos = ""
         while self.active:
-            time.sleep(0.5)
-            selected = self.list_box.get(tk.ANCHOR)
-            wid = self.placer.get_widget(self.placer.choosen_name)
-            if not selected:
+            if self.multi_selected_var.get() == 1:
+                self.placer.in_multiple_selection = True
+                self.list_box_multi.place(x=800,y=300)
+                self.list_box_multi.insert(0,[w.name for w in self.placer.selected_multi_list])
+            else:
 
-                if not wid:
-                    continue
-                self.select_widget(wid)
-                continue
-            if self.placer.choosen_name != selected:
-                if not self.placer.force_select:
-                    print("moshe")
-                    self.placer.choosen_name = selected
-                    self.placer.choosen = self.placer.get_widget(selected).widget
-                    self.update_top_bar()
-                else:
+                self.list_box_multi.place_forget()
+                self.placer.in_multiple_selection =False
+                time.sleep(0.5)
+                selected = self.list_box.get(tk.ANCHOR)
+                wid = self.placer.get_widget(self.placer.choosen_name)
+                if not selected:
+
+                    if not wid:
+                        continue
                     self.select_widget(wid)
 
-            self.txt_choosen_name.config(text=self.placer.choosen_name)
+
+                    continue
+                if self.placer.choosen_name != selected:
+                    if not self.placer.force_select:
+                        print("moshe")
+                        self.placer.choosen_name = selected
+                        self.placer.choosen = self.placer.get_widget(selected).widget
+
+                        self.update_top_bar()
+                        pos = f"   ( = {self.placer.choosen.winfo_x()},y = {self.placer.choosen.winfo_y()})"
+                    else:
+                        self.select_widget(wid)
+
+                if pos:
+                    pos = f"   ( = {self.placer.choosen.winfo_x()},y = {self.placer.choosen.winfo_y()})"
+                self.txt_choosen_name.config(text=self.placer.choosen_name + pos)
 
 
 
-
+    def duplicate_widget(self):
+        self.placer.duplicate()
+        self.list_box.insert(tk.END, self.placer.choosen_name)
 
     def add(self, type_):
-        self.placer.add_widget(type_, self.w_entry_name.get())
+        name = self.w_entry_name.get()
+        if not name:
+            name = f"_{self.placer.amounts}"
+        self.placer.add_widget(type_, name)
         self.list_box.insert(tk.END, self.placer.choosen_name)
 
     def show_widgets_layer(self, e):
@@ -179,8 +208,10 @@ class RenderEditor(Screen):
         self.w_canvas.config(width=500, height=500)
         self.w_btn.place(x=70, y=20)
         self.w_label.place(x=20, y=20)
+        self.w_entry.place(x=120,y=20)
         self.w_name_label.place(x=0,y=0)
         self.w_entry_name.place(x=70, y=0)
+
 
     def hide_widgets_layer(self, e):
         self.w_label_canvas.config(width=1, height=1)
