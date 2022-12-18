@@ -18,6 +18,7 @@ class Parent:
 
 class Placer:
     def __init__(self, root):
+        self.handler = None
         self.root = root
         self.root.bind('<Motion>', self.motion)
         self.root.bind("<ButtonPress-1>", lambda event: self.capture(True))
@@ -51,11 +52,16 @@ class Placer:
             parent__ = Parent(self.root, "self.win")
         return parent__
 
+    def add_handler(self,func):
+
+        self.handlers = func
+
     def add_widget(self, widget:WBase, name, parent=None):
         parent__ = self.config_parent(parent)
         if name in self.widgets:
             name = f"{name}_{self.amounts}"
         new_widget = widget.create_widget(name,parent__,self.set_choosen)
+
         new_widget.update()
 
         self.choosen_name = new_widget.name
@@ -110,19 +116,25 @@ class Placer:
         self.choosen_name = first_wid.name if first_wid else None
 
     def motion(self, event):
+
         if self.do_capture and self.choosen:
             self.in_motion = True
             x, y = event.x, event.y
             self.choosen.place_configure(x=x, y=y)
             if not self.in_multiple_selection:
+
                 if self.is_auto_correct_enabled:
                     self.detect_horizontal_points()
                     self.detect_vertical_points()
             else:
+
                 if not self.selected_multi_list:
                     return
+        if self.handlers and self.choosen:
+            self.handlers(self.get_widget(self.choosen_name))
+        print(self.handlers)
 
-        print(threading.activeCount(), len(self.selected_multi_list))
+
 
     def detect_vertical_points(self):
         canvases = []

@@ -9,7 +9,9 @@ class WLabel(WBase):
         super().__init__(name, parent)
         self.conf = None
         self.supported = ("text","bg","width","height","border","font")
-        self.widget=tkinter.Label(parent.parent)
+
+    def init(self):
+        self.widget = tkinter.Label(self.parent.parent)
         self.widget.pack()
         self.set_conf(text="sample")
 
@@ -19,6 +21,6 @@ class WLabel(WBase):
 
     def generate_code_for_widget(self) -> str:
         statement = \
-            f"""self.{self.name} = tk.Label({self.parent},
+            f"""self.{self.name} = tk.Label({self.parent.name},
             {','.join([f' {k}= "{v}"' for k, v in self.conf.options.items()])})"""
         return statement

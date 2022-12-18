@@ -9,12 +9,14 @@ class WOval(WCanvas):
         self.conf = None
         self.bg = None
         self.supported = (*self.supported,"inner color")
-        self.widget = tkinter.Canvas(parent.parent)
+
+
+    def init(self):
+        self.widget = tkinter.Canvas(self.parent.parent)
         self.set_conf(width=100, height=100, bg="red")
-        self.widget.create_oval(0, 0, self.conf.options['width'], self.conf.options['height'], fill=self.conf.options['bg'])
+        self.widget.create_oval(0, 0, self.conf.options['width'], self.conf.options['height'],
+                                fill=self.conf.options['bg'])
         self.widget.pack()
-
-
 
     @property
     def type(self):
@@ -28,7 +30,7 @@ class WOval(WCanvas):
 
     def generate_code_for_widget(self) -> str:
         statement = \
-            f"""self.{self.name} = tk.Canvas({self.parent},
+            f"""self.{self.name} = tk.Canvas({self.parent.name},
             {','.join([f' {k}= "{v}"' for k, v in self.conf.options.items()])})
             \n\t\tself.{self.name}.create_oval(0,0,{self.conf.options['width']},{self.conf.options['height']},fill=\"{self.bg}\")"""
         return statement

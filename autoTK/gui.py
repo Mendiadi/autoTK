@@ -96,8 +96,8 @@ class TopBar:
         self.labels_supported = {}
         self.editor = editor
         self.root = root
-        self.top_bar = tk.Canvas(self.root, height=150, width=600, bg="lightblue")
-        self.txt_choosen_name = tk.Label(self.top_bar)
+        self.top_bar = tk.Canvas(self.root, height=170, width=600, bg="lightblue")
+        self.txt_choosen_name = tk.Label(self.top_bar,font="none 15 bold",bg="lightblue")
         self.options_entries = {}
         self.set_x_entry = tk.Entry(self.top_bar, width=8, bg="green")
         self.set_y_entry = tk.Entry(self.top_bar, width=8, bg="red")
@@ -108,7 +108,7 @@ class TopBar:
 
 
 
-        self.txt_choosen_name.place(x=200, y=120)
+        self.txt_choosen_name.place(x=10, y=150)
         self.duplicate_btn = tk.Button(self.top_bar, text="clone", command=self.editor.duplicate_widget)
         self.duplicate_btn.place(x=450, y=80)
         self.multi_selected_var = tk.IntVar()
@@ -124,14 +124,14 @@ class TopBar:
                                                             variable=self.enable_auto_correct_check_var,
                                                             offvalue=0, onvalue=1,
                                                             bg="lightblue", border=0, activebackground="lightblue",
-                                                            selectcolor="grey")
+                                                            command=self.enable_auto_correct)
         self.add_onclick_template_var = tk.IntVar()
         self.add_onclick_template_btn = tk.Checkbutton(self.top_bar,
                                                        text="add onclick template",
                                                        variable=self.add_onclick_template_var,
                                                        offvalue=0, onvalue=1,
                                                        bg="lightblue", border=0, activebackground="lightblue",
-                                                       selectcolor="grey")
+                                                       command=self.onclick_check_button)
         self.multi_selected_check_btn.place(x=500, y=90)
         self.enable_auto_correct_check_btn.place(x=50, y=90)
 
@@ -154,6 +154,11 @@ class TopBar:
             else:
                 update_fn = functools.partial(self.update_widget_options, supported=supported, entry=e)
             if options.type.value == WTypes.BUTTON.value:
+
+                if options.onclick_template:
+                    self.add_onclick_template_btn.select()
+                else:
+                    self.add_onclick_template_btn.deselect()
                 self.add_onclick_template_btn.place(x=10,y=130)
             else:
                 self.add_onclick_template_btn.place_forget()
@@ -174,11 +179,19 @@ class TopBar:
     def update(self,widget:WBase):
         if self.editor.in_updating_options:
             return
-        print(self.options_entries)
+        print("%"*200)
         temp = dict(widget.conf.options)
         for option, value in temp.items():
             e = self.options_entries[option]
             e.insert(0, value)
+        x, y =widget.widget.winfo_x(),widget.widget.winfo_y()
+        self.set_x_entry.delete(0,tk.END)
+        self.set_y_entry.delete(0, tk.END)
+        self.set_x_entry.insert(0,x)
+        self.set_y_entry.insert(0,y)
+        self.txt_choosen_name.config(text=f"Variable: {self.editor.placer.choosen_name} "
+             f" Type: {type(self.editor.placer.choosen).__name__}"
+             f"  Position: ( X = {x}, Y = {y} )")
 
 
     def update_widget_options(self, e, entry, supported):
@@ -198,6 +211,14 @@ class TopBar:
             self.set_y_entry.insert(0, str(self.editor.placer.choosen.winfo_y()))
             self.set_x_entry.insert(0, str(self.editor.placer.choosen.winfo_x()))
 
+    def onclick_check_button(self):
+        w = self.editor.placer.get_widget(self.editor.placer.choosen_name)
+        w.onclick_template = bool(self.add_onclick_template_var.get())
+
+    def enable_auto_correct(self):
+
+        self.editor.placer.is_auto_correct_enabled = bool(self.enable_auto_correct_check_var.get())
+
 class RenderEditor(Screen):
     def __init__(self, win, gui, height, width):
         super().__init__(win, gui)
@@ -210,6 +231,7 @@ class RenderEditor(Screen):
 
         self.second_win.pack_propagate(False)
         self.placer = Placer(self.second_win)
+        self.placer.add_handler(self.top_bar.update)
         # widgets layer
 
         self.w_btns_widgets = []
@@ -274,35 +296,25 @@ class RenderEditor(Screen):
         self.list_box.select_anchor(wid.index)
         print(wid.__dict__, "&"*100)
 
+    def handle_multiple_selection(self):
+        self.placer.in_multiple_selection = True
+        self.list_box_multi.place(x=500 + (self.second_win.winfo_width() // 2), y=38)
 
+        if len(self.temp_multi_selection) != len(self.placer.selected_multi_list):
+            print(self.placer.selected_multi_list, "***", self.temp_multi_selection)
+            self.temp_multi_selection = list(self.placer.selected_multi_list)
+
+            self.list_box_multi.delete(0, tk.END)
+            for i, w in enumerate(self.temp_multi_selection):
+                content = f"\n{w.name} type {type(w.widget).__name__}"
+                self.list_box_multi.insert(i, content)
 
     def _thread_update_chosen(self):
         pos = ""
         while self.active:
             time.sleep(0.5)
-            if type(self.placer.choosen) == tk.Button:
-                if self.top_bar.add_onclick_template_var.get() == 1:
-                    print("yes")
-                    self.placer.get_widget(self.placer.choosen_name).onclick_template = True
-                else:
-                    print("no")
-                    self.placer.get_widget(self.placer.choosen_name).onclick_template = False
-            if self.top_bar.enable_auto_correct_check_var.get() == 1:
-                self.placer.is_auto_correct_enabled = True
-            else:
-                self.placer.is_auto_correct_enabled = False
             if self.top_bar.multi_selected_var.get() == 1:
-                self.placer.in_multiple_selection = True
-                self.list_box_multi.place(x=500 + (self.second_win.winfo_width() // 2), y=38)
-
-                if len(self.temp_multi_selection) != len(self.placer.selected_multi_list):
-                    print(self.placer.selected_multi_list, "***", self.temp_multi_selection)
-                    self.temp_multi_selection = list(self.placer.selected_multi_list)
-
-                    self.list_box_multi.delete(0, tk.END)
-                    for i, w in enumerate(self.temp_multi_selection):
-                        content = f"\n{w.name} type {type(w.widget).__name__}"
-                        self.list_box_multi.insert(i, content)
+                self.handle_multiple_selection()
             else:
 
                 self.list_box_multi.place_forget()
@@ -328,7 +340,7 @@ class RenderEditor(Screen):
                         print("moshe")
                         self.placer.choosen_name = selected
                         self.placer.choosen = self.placer.get_widget(selected).widget
-
+                        self.top_bar.update(wid)
 
 
                         pos = f"   (x = {self.placer.choosen.winfo_x()},y = {self.placer.choosen.winfo_y()})"
@@ -341,8 +353,7 @@ class RenderEditor(Screen):
                 if pos:
                     pos = f"   (x = {self.placer.choosen.winfo_x()},y = {self.placer.choosen.winfo_y()})"
 
-                self.top_bar.txt_choosen_name.config(text=f"Variable: {self.placer.choosen_name} "
-                                                  f" type: {type(self.placer.choosen).__name__}  position: {pos}")
+
 
     def duplicate_widget(self):
         self.placer.duplicate()

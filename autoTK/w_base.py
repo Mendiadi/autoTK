@@ -16,8 +16,10 @@ class WBase:
         self.conf = None
         self.name = name
         self.widget = None
-        self.parent = parent.name
+        self.parent = parent
         self.supported = None
+
+    def init(self):...
 
     def update(self):
 
@@ -35,6 +37,7 @@ class WBase:
     @classmethod
     def create_widget(cls, name, parent, func):
         instance = cls(name, parent)
+        instance.init()
         instance.widget.bind("<Button-1>", lambda x: func(instance))
         return instance
 

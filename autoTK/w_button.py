@@ -10,7 +10,8 @@ class WButton(WBase):
         self.conf = None
         self.onclick_template = False
         self.supported = ("text", "bg", "width", "height", "border", "font")
-        self.widget = tkinter.Button(parent.parent)
+    def init(self):
+        self.widget = tkinter.Button(self.parent.parent)
         self.widget.pack()
         self.set_conf(text="sample")
     @property
@@ -21,6 +22,6 @@ class WButton(WBase):
         if self.onclick_template:
             self.conf.options["command"] = f"self.{self.name}_onclick"
         statement = \
-            f"""self.{self.name} = tk.Button({self.parent},
+            f"""self.{self.name} = tk.Button({self.parent.name},
             {','.join([f' {k}= "{v}"' if k != "command" else f' {k}= {v}' for k, v in self.conf.options.items()])})"""
         return statement
