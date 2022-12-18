@@ -4,6 +4,7 @@ import threading
 
 from autoTK.w_base import WTypes
 from autoTK.w_button import WButton
+from autoTK.w_canvas import WCanvas
 from autoTK.w_entry import WEntry
 from autoTK.w_label import WLabel
 
@@ -38,7 +39,16 @@ class Placer:
         return wid
 
     def add_widget(self, type_, name, parent=None):
-        parent__ = Parent(self.widgets[parent].widget, f"self.{parent}") if parent else Parent(self.root, "self.win")
+        if parent:
+            par_wid = self.widgets.get(parent,None)
+            if not par_wid:
+                parent__ = Parent(self.root, "self.win")
+            else:
+                parent__ = Parent(par_wid.widget, f"self.{parent}")
+            print(par_wid.__dict__,"$"*200)
+        else:
+            parent__ = Parent(self.root, "self.win")
+
         if name in self.widgets:
             name = f"{name}_{self.amounts}"
         if type_.value == WTypes.LABEL.value:
@@ -46,16 +56,25 @@ class Placer:
             wid.pack()
             w = WLabel.create_widget(name,
                                      parent__.name, wid, self.set_choosen)
+            w.set_conf(text="sample")
         elif type_.value == WTypes.BUTTON.value:
             wid = tk.Button(parent__.parent)
             wid.pack()
             w = WButton.create_widget(name,
                                       parent__.name, wid, self.set_choosen)
+            w.set_conf(text="sample")
         elif type_.value == WTypes.ENTRY.value:
             wid = tk.Entry(parent__.parent)
             wid.pack()
             w = WEntry.create_widget(name, parent__.name, wid, self.set_choosen)
-        w.set_conf(text="sample")
+            w.set_conf()
+        elif type_.value == WTypes.CANVAS.value:
+            wid = tk.Canvas(parent__.parent)
+            wid.pack_propagate(False)
+            wid.pack()
+            w = WCanvas.create_widget(name, parent__.name, wid, self.set_choosen)
+            w.set_conf()
+
         w.update()
 
         self.choosen_name = w.name
@@ -186,9 +205,11 @@ class Placer:
     def duplicate(self):
         temp = self.choosen_name
         name = self.choosen_name + str(self.amounts)
-        self.add_widget(self.widgets[self.choosen_name].type, name)
+        print(self.widgets[self.choosen_name].type,"@"*100)
+        self.add_widget(self.widgets[self.choosen_name].type,
+                        name,self.widgets[self.choosen_name].parent.replace("self.",""))
         self.widgets[name].set_conf(**self.widgets[temp].conf.options)
-        print(self.widgets[name].conf.options, "*" * 200)
+        print(self.widgets[name].__dict__, "*" * 200)
         self.widgets[name].update()
 
     def capture(self, flag):

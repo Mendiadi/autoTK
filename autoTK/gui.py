@@ -117,6 +117,8 @@ class RenderEditor(Screen):
                                  border=0, bg="lightgreen")
         self.w_label = tk.Button(self.w_canvas, text="label", command=lambda: self.add(WTypes.LABEL),
                                  border=0, bg="lightgreen")
+        self.w_canvas_create = tk.Button(self.w_canvas, text="canvas", command=lambda: self.add(WTypes.CANVAS),
+                                 border=0, bg="lightgreen")
         self.w_name_label = tk.Label(self.w_canvas, text="Variable: ", bg="red", font="none 10 bold")
         self.w_canvas.pack()
         self.w_label_canvas.pack()
@@ -134,7 +136,7 @@ class RenderEditor(Screen):
         self.set_x_entry = tk.Entry(self.top_bar, width=8, bg="green")
         self.set_y_entry = tk.Entry(self.top_bar, width=8, bg="red")
         self.set_y_entry.bind("<Leave>", lambda x: self.placer.choosen.place(y=int(self.set_y_entry.get())))
-        self.set_x_entry.bind("<Leave>", lambda x: self.placer.choosen.place(x=int(self.set_y_entry.get())))
+        self.set_x_entry.bind("<Leave>", lambda x: self.placer.choosen.place(x=int(self.set_x_entry.get())))
         import functools
 
         for i, supported in enumerate(Options().supported):
@@ -213,15 +215,22 @@ class RenderEditor(Screen):
         for entry in self.options_entries.values():
             entry.delete(0, tk.END)
         for option, value in temp.items():
+
             e = self.options_entries[option]
             e.insert(0, value)
 
-        if type(op) == WEntry:
+        if op.type.value == WTypes.ENTRY.value:
             self.options_entries["height"].config(state="disabled")
+            self.options_entries["text"].config(state="disabled")
         else:
             self.options_entries["height"].config(state="normal")
+            self.options_entries["text"].config(state="normal")
+        if op.type.value == WTypes.CANVAS.value:
+            self.options_entries["text"].config(state="disabled")
+        else:
+            self.options_entries["text"].config(state="normal")
 
-        if type(op) == WButton:
+        if op.type.value == WTypes.BUTTON.value:
             self.add_onclick_template_btn.place(x=10, y=70)
             self.add_onclick_template_var.set(op.onclick_template)
         else:
@@ -314,7 +323,7 @@ class RenderEditor(Screen):
     def add(self, type_):
         name = self.w_entry_name.get()
         if not name or name in self.placer.widgets:
-            name = f"_{self.placer.amounts}"
+            name = f"var_{self.placer.amounts}"
 
         p = self.w_entry_set_parent.get()
         if p not in self.placer.widgets:
@@ -330,9 +339,11 @@ class RenderEditor(Screen):
         self.w_btn.place(x=70, y=20)
         self.w_label.place(x=20, y=20)
         self.w_entry.place(x=120, y=20)
+        self.w_canvas_create.place(x=160,y=20)
         self.w_name_label.place(x=0, y=0)
         self.w_entry_name.place(x=70, y=0)
         self.w_entry_set_parent.place(y=0, x=210)
+
 
     def hide_widgets_layer(self, e):
         self.w_label_canvas.config(width=1, height=1)
@@ -365,6 +376,8 @@ class GUI:
         self.builder = None
 
     def add_builder(self, name, size):
+        if not name:
+            name = "samplePage"
         self.builder = Builder(name, size)
 
     def move_to_editor(self, h, w):

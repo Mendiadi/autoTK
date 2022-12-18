@@ -4,6 +4,7 @@ from autoTK.options import Options
 
 
 class WTypes(Enum):
+    CANVAS = 3
     ENTRY = 2
     BUTTON = 1
     LABEL = 0
@@ -21,6 +22,7 @@ class WBase:
         print(self.conf.options)
         if self.conf._args_supported(self.conf.options):
             self.widget.config(**self.conf.options)
+
 
     def set_conf(self, **options):
         self.conf = Options(**options)
