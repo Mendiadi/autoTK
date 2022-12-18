@@ -119,6 +119,8 @@ class RenderEditor(Screen):
                                  border=0, bg="lightgreen")
         self.w_canvas_create = tk.Button(self.w_canvas, text="canvas", command=lambda: self.add(WTypes.CANVAS),
                                  border=0, bg="lightgreen")
+        self.w_oval = tk.Button(self.w_canvas, text="oval", command=lambda: self.add(WTypes.OVAL),
+                                 border=0, bg="lightgreen")
         self.w_name_label = tk.Label(self.w_canvas, text="Variable: ", bg="red", font="none 10 bold")
         self.w_canvas.pack()
         self.w_label_canvas.pack()
@@ -137,6 +139,9 @@ class RenderEditor(Screen):
         self.set_y_entry = tk.Entry(self.top_bar, width=8, bg="red")
         self.set_y_entry.bind("<Leave>", lambda x: self.placer.choosen.place(y=int(self.set_y_entry.get())))
         self.set_x_entry.bind("<Leave>", lambda x: self.placer.choosen.place(x=int(self.set_x_entry.get())))
+        self.entry_color_oval = tk.Entry(self.top_bar, bg="lightgreen")
+        self.entry_color_oval.bind("<Leave>", lambda x:self.placer.update_widget(self.entry_color_oval.get()))
+        self.entry_color_oval.place(x=200,y=100)
         import functools
 
         for i, supported in enumerate(Options().supported):
@@ -229,10 +234,13 @@ class RenderEditor(Screen):
             self.options_entries["text"].config(state="disabled")
         else:
             self.options_entries["text"].config(state="normal")
-
+        if op.type.value != WTypes.OVAL.value:
+            self.entry_color_oval.place_forget()
+        else:
+            self.entry_color_oval.place(x=200,y=100)
         if op.type.value == WTypes.BUTTON.value:
             self.add_onclick_template_btn.place(x=10, y=70)
-            self.add_onclick_template_var.set(op.onclick_template)
+            self.add_onclick_template_var.set(1 if op.onclick_template else 0)
         else:
             self.add_onclick_template_btn.place_forget()
 
@@ -339,10 +347,12 @@ class RenderEditor(Screen):
         self.w_btn.place(x=70, y=20)
         self.w_label.place(x=20, y=20)
         self.w_entry.place(x=120, y=20)
+        self.w_oval.place(x=220,y=20)
         self.w_canvas_create.place(x=160,y=20)
         self.w_name_label.place(x=0, y=0)
         self.w_entry_name.place(x=70, y=0)
         self.w_entry_set_parent.place(y=0, x=210)
+
 
 
     def hide_widgets_layer(self, e):
@@ -357,6 +367,7 @@ class RenderEditor(Screen):
         self.w_label_canvas.config(text="+")
         self.w_entry.place_forget()
         self.w_entry_set_parent.place_forget()
+        self.w_oval.place_forget()
 
     def save(self):
         self.gui.builder.bg = self.bg_entry.get()

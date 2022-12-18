@@ -7,6 +7,7 @@ from autoTK.w_button import WButton
 from autoTK.w_canvas import WCanvas
 from autoTK.w_entry import WEntry
 from autoTK.w_label import WLabel
+from autoTK.w_oval import WOval
 
 
 class Parent:
@@ -45,7 +46,7 @@ class Placer:
                 parent__ = Parent(self.root, "self.win")
             else:
                 parent__ = Parent(par_wid.widget, f"self.{parent}")
-            print(par_wid.__dict__,"$"*200)
+                print(par_wid.__dict__,"$"*200)
         else:
             parent__ = Parent(self.root, "self.win")
 
@@ -74,6 +75,12 @@ class Placer:
             wid.pack()
             w = WCanvas.create_widget(name, parent__.name, wid, self.set_choosen)
             w.set_conf()
+        elif type_.value == WTypes.OVAL.value:
+            wid = tk.Canvas(parent__.parent)
+            w = WOval.create_widget(name, parent__.name, wid, self.set_choosen)
+            w.set_conf(width=100,height=100,bg="red")
+            wid.create_oval(0,0,w.conf.options['width'],w.conf.options['height'],fill=w.conf.options['bg'])
+            wid.pack()
 
         w.update()
 
@@ -81,6 +88,17 @@ class Placer:
         self.widgets[w.name] = w
         w.index = self.amounts
         self.amounts += 1
+
+    def update_widget(self,value):
+        w = self.widgets[self.choosen_name]
+        if w.type.value == WTypes.OVAL.value:
+            w.bg = value
+            self.choosen.create_oval(0, 0,
+                        w.conf.options['width'],
+                        w.conf.options['height'],
+                        fill=w.bg)
+
+
 
     def set_choosen(self, wid):
         if not self.in_multiple_selection:
