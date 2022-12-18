@@ -22,20 +22,22 @@ class Converter:
                f"root = tk.Tk()\n\t" \
                f"gui = {self.name.capitalize()}(root)\n\t" \
                f"root.geometry('{self.structure['size']}')" \
-               f"\n\tgui.load()\n\troot.mainloop()"
+               f"\n\tgui.place_widgets()\n\troot.mainloop()"
 
     def _get_base_template(self):
         return "import tkinter as tk" \
                f"\n\nclass {self.name.capitalize()}:\n" \
                f"\tdef __init__(self,win):\n" \
-               f"\t\tself.win = win\n\t\tself.win.config(bg= \"{self.bg}\")\n\t\t"
+               f"\t\t\"\"\"initials all the widgets\"\"\"" \
+               f"\n\t\tself.win = win\n\t\tself.win.config(bg= \"{self.bg}\")\n\t\t"
 
     def create_structure(self, attributes, statements):
         print("*" * 100, attributes)
         top_template = self._get_base_template()
         top_template += "".join(attributes)
 
-        load_func = "\n\tdef load(self):\n\t\t"
+        load_func = "\n\tdef place_widgets(self):\n\t\t\"\"\"" \
+                    "placing all the widgets\"\"\" \n\t\t"
         load_func += "".join(statements)
 
         return f"{self._get_descriptions()}{top_template}\n{load_func}\
