@@ -1,11 +1,17 @@
+import tkinter
+
 from autoTK.w_base import WBase, WTypes
 
 
 class WCanvas(WBase):
-    def __init__(self, name, parent, widget):
-        super().__init__(name, parent, widget)
+    def __init__(self, name, parent):
+        super().__init__(name, parent)
         self.conf = None
-
+        self.supported = ( "bg", "width", "height", "border")
+        self.widget = tkinter.Canvas(parent.parent)
+        self.widget.pack_propagate(False)
+        self.widget.pack()
+        self.set_conf()
     @property
     def type(self):
         return WTypes.CANVAS

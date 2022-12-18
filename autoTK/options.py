@@ -1,12 +1,12 @@
 
 class Options:
-    _supported_args = ("text", "bg", "width", "height", "font", "border")
-    def __init__(self ,**kwargs):
 
+    def __init__(self ,supported,**kwargs):
+        self._supported_args = supported
         if not self._args_supported(kwargs):
             raise Exception("args not supported")
         self._options =  kwargs
-        print(self._options)
+
 
 
 

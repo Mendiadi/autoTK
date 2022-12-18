@@ -1,10 +1,16 @@
+import tkinter
+
 from autoTK.w_base import WBase, WTypes
 
 
 class WEntry(WBase):
-    def __init__(self, name, parent, widget):
-        super().__init__(name, parent, widget)
+    def __init__(self, name, parent):
+        super().__init__(name, parent)
         self.conf = None
+        self.supported = ( "bg", "width", "border", "font")
+        self.widget = tkinter.Entry(parent.parent)
+        self.set_conf()
+        self.widget.pack()
 
     @property
     def type(self):

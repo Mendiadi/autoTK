@@ -2,7 +2,7 @@ import tkinter as tk
 
 import threading
 
-from autoTK.w_base import WTypes
+from autoTK.w_base import WTypes, WBase
 from autoTK.w_button import WButton
 from autoTK.w_canvas import WCanvas
 from autoTK.w_entry import WEntry
@@ -39,7 +39,7 @@ class Placer:
         wid = self.widgets.get(name, None)
         return wid
 
-    def add_widget(self, type_, name, parent=None):
+    def config_parent(self,parent):
         if parent:
             par_wid = self.widgets.get(parent,None)
             if not par_wid:
@@ -49,44 +49,18 @@ class Placer:
                 print(par_wid.__dict__,"$"*200)
         else:
             parent__ = Parent(self.root, "self.win")
+        return parent__
 
+    def add_widget(self, widget:WBase, name, parent=None):
+        parent__ = self.config_parent(parent)
         if name in self.widgets:
             name = f"{name}_{self.amounts}"
-        if type_.value == WTypes.LABEL.value:
-            wid = tk.Label(parent__.parent)
-            wid.pack()
-            w = WLabel.create_widget(name,
-                                     parent__.name, wid, self.set_choosen)
-            w.set_conf(text="sample")
-        elif type_.value == WTypes.BUTTON.value:
-            wid = tk.Button(parent__.parent)
-            wid.pack()
-            w = WButton.create_widget(name,
-                                      parent__.name, wid, self.set_choosen)
-            w.set_conf(text="sample")
-        elif type_.value == WTypes.ENTRY.value:
-            wid = tk.Entry(parent__.parent)
-            wid.pack()
-            w = WEntry.create_widget(name, parent__.name, wid, self.set_choosen)
-            w.set_conf()
-        elif type_.value == WTypes.CANVAS.value:
-            wid = tk.Canvas(parent__.parent)
-            wid.pack_propagate(False)
-            wid.pack()
-            w = WCanvas.create_widget(name, parent__.name, wid, self.set_choosen)
-            w.set_conf()
-        elif type_.value == WTypes.OVAL.value:
-            wid = tk.Canvas(parent__.parent)
-            w = WOval.create_widget(name, parent__.name, wid, self.set_choosen)
-            w.set_conf(width=100,height=100,bg="red")
-            wid.create_oval(0,0,w.conf.options['width'],w.conf.options['height'],fill=w.conf.options['bg'])
-            wid.pack()
+        new_widget = widget.create_widget(name,parent__,self.set_choosen)
+        new_widget.update()
 
-        w.update()
-
-        self.choosen_name = w.name
-        self.widgets[w.name] = w
-        w.index = self.amounts
+        self.choosen_name = new_widget.name
+        self.widgets[new_widget.name] = new_widget
+        new_widget.index = self.amounts
         self.amounts += 1
 
     def update_widget(self,value):
@@ -224,7 +198,7 @@ class Placer:
         temp = self.choosen_name
         name = self.choosen_name + str(self.amounts)
         print(self.widgets[self.choosen_name].type,"@"*100)
-        self.add_widget(self.widgets[self.choosen_name].type,
+        self.add_widget(type(self.widgets[self.choosen_name]),
                         name,self.widgets[self.choosen_name].parent.replace("self.",""))
         self.widgets[name].set_conf(**self.widgets[temp].conf.options)
         print(self.widgets[name].__dict__, "*" * 200)
