@@ -24,6 +24,7 @@ class WBase:
 
     def update(self):
         if self.conf._args_supported(self.conf.options):
+            print(self.conf.options)
             self.widget.config(**self.conf.options)
 
     def set_conf(self, **options):

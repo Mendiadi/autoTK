@@ -8,7 +8,11 @@ class WButton(WBase):
         super().__init__(name, parent)
         self.conf = None
         self.onclick_template = False
-        self.supported = ("text", "bg", "width", "height", "border", "font")
+        self.supported = (
+            "text", "bg", "width",
+            "height", "border", "font",
+            "fg","state"
+        )
 
     def init(self):
         self.widget = tkinter.Button(self.parent.parent)

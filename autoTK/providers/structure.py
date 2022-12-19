@@ -32,7 +32,6 @@ class Structure:
                f"\n\t\tself.win = win\n\t\tself.win.config(bg= \"{self.bg}\")\n\t\t"
 
     def create_structure(self, attributes, statements):
-        print("*" * 100, attributes)
         top_template = self._get_base_template()
         top_template += "".join(attributes)
 

@@ -109,10 +109,10 @@ class RenderWindow:
                 self.detect_horizontal_points()
                 self.detect_vertical_points()
 
-        if self.handlers and self.choosen:
-            self.handlers["update"](self.get_widget(self.choosen_name))
+            if self.handlers and self.choosen:
+                self.handlers["update"](self.get_widget(self.choosen_name))
 
-        print(self.handlers)
+            print(self.handlers)
 
     def detect_vertical_points(self):
         canvases = []

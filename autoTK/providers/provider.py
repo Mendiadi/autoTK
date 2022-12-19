@@ -12,9 +12,11 @@ class Provider:
         self.w_statements = None
         self.structure = None
         self.bg="white"
+        self.dir = None
 
 
-    def build(self, *widgets):
+    def build(self,dir, *widgets):
+        self.dir = dir
         self.structure = Structure(self.name, self.size, [
             w for w in widgets if type(w) == WButton and w.onclick_template
         ], self.bg)
@@ -22,10 +24,12 @@ class Provider:
         self._prepare_file()
 
     def _prepare_file(self):
+
         if self.structure.name not in os.listdir():
-            with open(self.structure.name + "_" + ".py", "w") as f:
+            path = os.path.join(self.dir,self.structure.name + "_" + ".py")
+            with open(path, "w") as f:
                 attrs = self.w_statements.generate_definition()
                 states = self.w_statements.generate_placing()
                 content = self.structure.create_structure(attrs, states)
                 f.write(content)
-                print(content)
+

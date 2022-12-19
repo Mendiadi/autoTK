@@ -28,13 +28,16 @@ class GUI:
         self.bg_image = tk.Label(self.screen.win, image=self.img)
         self.bg_image.image = self.img
         self.bg_image.place(x=0, y=0)
-        if int(h) + 450 < 500:
+        if int(h) + 250 < 500:
             h = 500
         if int(w) + 400 < 800:
             w = 800
-        self.screen.win.geometry(f"{int(w) + 400}x{int(h) + 450}")
+        self.screen.win.geometry(f"{int(w) + 400}x{int(h) + 250}")
         self.temp = RenderEditor(self.screen.win, self, int(h), int(w))
 
-
+    def exit(self):
+        self.screen.destroy()
+        self.screen.win.destroy()
+        quit(0)
 
 
