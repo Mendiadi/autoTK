@@ -98,17 +98,18 @@ class TopBar:
         self.root = root
         self.top_bar = tk.Canvas(self.root, height=170, width=600, bg="lightblue")
         self.txt_choosen_name = tk.Label(self.top_bar,font="none 15 bold",bg="lightblue")
+        self.txt_choosen_pos = tk.Label(self.top_bar,font="none 15 bold",bg="lightblue")
         self.options_entries = {}
-        self.set_x_entry = tk.Entry(self.top_bar, width=8, bg="green")
-        self.set_y_entry = tk.Entry(self.top_bar, width=8, bg="red")
+        self.set_x_entry = tk.Entry(self.top_bar, width=4, bg="lightblue",font="none 8 bold")
+        self.set_y_entry = tk.Entry(self.top_bar, width=4, bg="lightblue",font="none 8 bold")
         self.set_y_entry.bind("<Leave>", lambda x: self.editor.placer.choosen.place(y=int(self.set_y_entry.get())))
         self.set_x_entry.bind("<Leave>", lambda x: self.editor.placer.choosen.place(x=int(self.set_x_entry.get())))
 
 
 
 
-
-        self.txt_choosen_name.place(x=10, y=150)
+        self.txt_choosen_pos.place(x=440,y=150)
+        self.txt_choosen_name.place(x=0, y=150)
         self.duplicate_btn = tk.Button(self.top_bar, text="clone", command=self.editor.duplicate_widget)
         self.duplicate_btn.place(x=450, y=80)
         self.multi_selected_var = tk.IntVar()
@@ -134,10 +135,31 @@ class TopBar:
                                                        command=self.onclick_check_button)
         # self.multi_selected_check_btn.place(x=500, y=90)
         self.enable_auto_correct_check_btn.place(x=50, y=90)
-
-        self.set_y_entry.place(x=400, y=130)
-        self.set_x_entry.place(x=500, y=130)
+        self.change_name_var_entry = tk.Entry(self.top_bar,width=10,bg="lightblue",font="none 8 bold")
+        self.change_name_var_entry.bind("<Leave>",lambda x: self.change_var_name())
+        self.change_name_var_entry.place(x=88,y=155)
+        self.set_x_entry.place(x=490, y=155)
+        self.set_y_entry.place(x=567, y=155)
         self.top_bar.pack()
+
+    def change_var_name(self):
+        name = self.editor.placer.choosen_name
+        txt = self.change_name_var_entry.get().replace(" ","_")
+
+        if txt and txt != " " and txt[0].isalpha() and txt not in self.editor.placer.widgets:
+
+
+            wid = self.editor.placer.widgets.pop(name,None)
+            if not wid:
+                return
+
+            wid.name =  txt
+            self.editor.placer.widgets[txt] = wid
+            self.editor.list_box.delete(wid.index,wid.index)
+            self.editor.list_box.insert(wid.index,txt)
+            self.change_name_var_entry.delete(0,tk.END)
+            self.change_name_var_entry.insert(0, wid.name)
+            self.editor.placer.set_choosen(wid)
 
     def generate_content(self,options):
         if self.options_entries:
@@ -149,7 +171,7 @@ class TopBar:
 
             e = tk.Entry(self.top_bar, width=10, bg="deepskyblue", border=0, font="none 10 bold")
             if options.type.value == WTypes.OVAL.value:
-                print("moshe")
+
                 update_fn = lambda x:self.editor.placer.update_widget(e.get())
             else:
                 update_fn = functools.partial(self.update_widget_options, supported=supported, entry=e)
@@ -163,7 +185,7 @@ class TopBar:
             else:
                 self.add_onclick_template_btn.place_forget()
             e.bind("<Leave>", update_fn)
-            print("%" * 50, supported)
+
             l.place(x=(i * 100) + 5, y=15)
             e.place(x=(i * 100) + 5, y=50)
             self.options_entries[supported] = e
@@ -179,7 +201,7 @@ class TopBar:
     def update(self,widget:WBase):
         if self.editor.in_updating_options:
             return
-        print("%"*200)
+
         temp = dict(widget.conf.options)
         for option, value in temp.items():
             e = self.options_entries[option]
@@ -190,10 +212,11 @@ class TopBar:
         self.set_y_entry.delete(0, tk.END)
         self.set_x_entry.insert(0,x)
         self.set_y_entry.insert(0,y)
-        self.txt_choosen_name.config(text=f"Variable: {self.editor.placer.choosen_name} "
-             f" Type: {type(self.editor.placer.choosen).__name__}"
-             f"  Position: ( X = {x}, Y = {y} )")
-
+        self.change_name_var_entry.delete(0,tk.END)
+        self.change_name_var_entry.insert(0,self.editor.placer.choosen_name)
+        self.txt_choosen_name.config(text=f"Variable:            "
+             f"Type: {type(self.editor.placer.choosen).__name__}")
+        self.txt_choosen_pos.config(text="( X =     ,  Y =     )")
 
     def update_widget_options(self, e, entry, supported):
         if self.editor.placer.amounts < 1:
@@ -242,6 +265,7 @@ class RenderEditor(Screen):
         self.placer.add_handler("update",self.top_bar.update)
         self.placer.add_handler("select",self.select_widget)
 
+
         # widgets layer
 
         self.w_btns_widgets = []
@@ -286,14 +310,23 @@ class RenderEditor(Screen):
         self.top_bar.show()
         self.second_win.pack(pady=50)
         self.active = True
-
+        self.list_box.bind("<Motion>",lambda x:self.handle_choose_from_list_box())
         self.in_updating_options = False
         self.temp_values = None
-        print(self.w_btns_widgets)
+
         self.temp_multi_selection = list(self.placer.selected_multi_list)
 
 
 
+    def handle_choose_from_list_box(self):
+
+        if self.list_box.size():
+            name = self.list_box.get(tk.ANCHOR)
+            if self.placer.choosen_name != name:
+                wid = self.placer.get_widget(name)
+                self.placer.set_choosen(wid)
+                self.top_bar.generate_content(wid)
+                self.top_bar.update(wid)
 
 
 
@@ -307,14 +340,14 @@ class RenderEditor(Screen):
         self.top_bar.generate_content(wid)
         self.top_bar.update(wid)
 
-        print(wid.__dict__, "&"*100)
+
 
     def handle_multiple_selection(self):
         self.placer.in_multiple_selection = True
         self.list_box_multi.place(x=500 + (self.second_win.winfo_width() // 2), y=38)
 
         if len(self.temp_multi_selection) != len(self.placer.selected_multi_list):
-            print(self.placer.selected_multi_list, "***", self.temp_multi_selection)
+
             self.temp_multi_selection = list(self.placer.selected_multi_list)
 
             self.list_box_multi.delete(0, tk.END)

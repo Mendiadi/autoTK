@@ -111,6 +111,7 @@ class Placer:
             self.amounts -= 1
         list_box.delete(0, tk.END)
         for i, widget in enumerate(self.widgets.values()):
+            widget.index = i
             list_box.insert(i, widget.name)
         if len(self.widgets):
             first_wid = list(self.widgets.values())[0]
