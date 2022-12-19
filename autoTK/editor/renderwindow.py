@@ -6,12 +6,24 @@ from autoTK.widgets.w_base import WTypes, WBase
 
 
 from autoTK.utils.common_types import Parent
-
+from autoTK.editor.scrolled import ScrolledWin
 
 class RenderWindow:
-    def __init__(self, root):
+    def __init__(self, root,h,w):
+
+        self.hook_scroll = False
         self.handlers = {}
-        self.root = root
+        self.win = root
+
+        if self.hook_scroll:
+            self.scrolled = ScrolledWin(root,h,w)
+            self.root = self.scrolled.hook()
+            print("*"*100)
+        else:
+            self.root = tk.Frame(self.win, height=h, width=w, bg="white")
+            self.root.pack(pady=50)
+
+        self.root.pack_propagate(False)
         self.root.bind('<Motion>', self.motion)
         self.root.bind("<ButtonPress-1>", lambda event: self.capture(True))
         self.root.bind("<ButtonRelease-1>", lambda event: self.capture(False))
@@ -29,6 +41,7 @@ class RenderWindow:
     def get_widget(self, name):
         wid = self.widgets.get(name, None)
         return wid
+
 
     def config_parent(self, parent):
         if parent:
@@ -112,7 +125,8 @@ class RenderWindow:
             if self.handlers and self.choosen:
                 self.handlers["update"](self.get_widget(self.choosen_name))
 
-            print(self.handlers)
+
+
 
     def detect_vertical_points(self):
         canvases = []
@@ -178,9 +192,14 @@ class RenderWindow:
                     break
 
     def duplicate(self):
+
         temp = self.choosen_name
+        if not temp:
+            return
         name = self.choosen_name + str(self.amounts)
+
         w = self.widgets[self.choosen_name]
+
         self.add_widget(type(w),
                         name, w.parent.name.replace("self.", ""))
         new_w = self.get_widget(name)

@@ -8,14 +8,14 @@ from autoTK.editor.editor_tool import RenderEditor
 
 class GUI:
     def __init__(self, win):
-        win.geometry("500x500")
+
         self.temp = None
         self.img = tk.PhotoImage(file="resources/bg.png")
         self.bg_image = tk.Label(win, image=self.img)
         self.bg_image.image = self.img
         self.bg_image.place(x=0, y=0)
         self.screen = StartScreen(win, self)
-        win.resizable(False, False)
+        # win.resizable(False, False)
         self.builder = None
 
     def add_provider(self, name, size):
@@ -39,5 +39,14 @@ class GUI:
         self.screen.destroy()
         self.screen.win.destroy()
         quit(0)
+
+    def new_project(self):
+        self.screen.destroy()
+        self.img = tk.PhotoImage(file="resources/bg.png")
+        self.bg_image = tk.Label(self.screen.win, image=self.img)
+        self.bg_image.image = self.img
+        self.bg_image.place(x=0, y=0)
+        self.screen = StartScreen(self.screen.win,self)
+
 
 

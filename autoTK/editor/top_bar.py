@@ -18,13 +18,12 @@ class TopBar:
         self.set_y_entry = tk.Entry(self.top_bar, width=4, bg="lightblue", font="none 8 bold")
         self.set_y_entry.bind("<Leave>", lambda x: self.editor.placer.choosen.place(y=int(self.set_y_entry.get())))
         self.set_x_entry.bind("<Leave>", lambda x: self.editor.placer.choosen.place(x=int(self.set_x_entry.get())))
-        self.duplicate_btn = tk.Button(self.top_bar, text="clone", command=self.editor.duplicate_widget)
-        self.duplicate_btn.place(x=450, y=80)
+
 
 
         self.add_onclick_template_var = tk.IntVar()
-        self.add_onclick_template_btn = tk.Checkbutton(self.top_bar,
-                                                       text="add onclick template",
+        self.add_onclick_template_btn = tk.Checkbutton(self.top_bar,font="none 10 bold",
+                                                       text="Add onclick Template",
                                                        variable=self.add_onclick_template_var,
                                                        offvalue=0, onvalue=1,
                                                        bg="lightblue", border=0, activebackground="lightblue",
@@ -105,7 +104,8 @@ class TopBar:
         self.txt_choosen_name.place_forget()
         self.set_x_entry.place_forget()
         self.set_y_entry.place_forget()
-
+        self.txt_choosen_name.place_forget()
+        self.txt_choosen_pos.place_forget()
         self.change_name_var_entry.place_forget()
 
         self.top_bar.config(height=10)

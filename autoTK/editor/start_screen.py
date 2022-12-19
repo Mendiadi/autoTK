@@ -18,6 +18,7 @@ class StartScreen(Screen):
 
     def __init__(self, win, gui):
         super().__init__(win, gui)
+        win.geometry("500x500")
         self.headline = tk.Label(self.win, text="WELCOME TO TKINTER DESIGNER", font="none 20 bold", bg="lightblue")
         self.canvas = tk.Canvas(self.win, width=100, height=100, bg="lightblue", border=0)
         self.content_label = tk.Label(self.win, text=self.content, bg="lightblue", font="none 10 bold")
