@@ -28,11 +28,9 @@ class Placer:
         self.choosen = None
         self.choosen_name = None
         self.widgets = {}
-        self.force_select = False
         self.amounts = 0
         self.memorize_detect = set()
         self.in_motion = False
-        self.in_multiple_selection = False
         self.selected_multi_list = set()
         self.is_auto_correct_enabled = False
 
@@ -84,31 +82,21 @@ class Placer:
         if not wid:
             self.choosen = None
             self.choosen_name = None
-            return
-        if not self.in_multiple_selection:
+        else:
             self.force_select = True
             self.choosen = wid.widget
             self.choosen_name = wid.name
             self.memorize_detect.clear()
             self.handlers["select"](wid)
-        else:
-            self.selected_multi_list.add(wid)
+        self.handlers["top_bar"]()
 
-    def delete_selected(self, list_box, m_list_box):
-        if self.in_multiple_selection:
-            for w in self.selected_multi_list:
-                w.widget.destroy()
-                self.widgets.pop(w.name, 0)
-                self.amounts -= 1
-            m_list_box.delete(0, tk.END)
-            self.selected_multi_list.clear()
-        else:
-            w = self.widgets.get(self.choosen_name, None)
-            if not w:
-                return
-            self.choosen.destroy()
-            self.widgets.pop(w.name, 0)
-            self.amounts -= 1
+    def delete_selected(self, list_box):
+        w = self.widgets.get(self.choosen_name, None)
+        if not w:
+            return
+        self.choosen.destroy()
+        self.widgets.pop(w.name, 0)
+        self.amounts -= 1
         list_box.delete(0, tk.END)
         for i, widget in enumerate(self.widgets.values()):
             widget.index = i
@@ -123,20 +111,19 @@ class Placer:
     def motion(self, event):
 
         if self.do_capture and self.choosen:
+
             self.in_motion = True
             x, y = event.x, event.y
             self.choosen.place_configure(x=x, y=y)
-            if not self.in_multiple_selection:
 
-                if self.is_auto_correct_enabled:
-                    self.detect_horizontal_points()
-                    self.detect_vertical_points()
-            else:
 
-                if not self.selected_multi_list:
-                    return
+            if self.is_auto_correct_enabled:
+                self.detect_horizontal_points()
+                self.detect_vertical_points()
+
         if self.handlers and self.choosen:
             self.handlers["update"](self.get_widget(self.choosen_name))
+
         print(self.handlers)
 
 
