@@ -1,11 +1,19 @@
+import tkinter
 
 from autoTK.w_base import WBase, WTypes
 
 
 class WLabel(WBase):
-    def __init__(self, name, parent, widget):
-        super().__init__(name, parent, widget)
+
+    def __init__(self, name, parent):
+        super().__init__(name, parent)
         self.conf = None
+        self.supported = ("text", "bg", "width", "height", "border", "font")
+
+    def init(self):
+        self.widget = tkinter.Label(self.parent.parent)
+        self.widget.pack()
+        self.set_conf(text="sample")
 
     @property
     def type(self):
@@ -13,6 +21,6 @@ class WLabel(WBase):
 
     def generate_code_for_widget(self) -> str:
         statement = \
-            f"""self.{self.name} = tk.Label({self.parent},
+            f"""self.{self.name} = tk.Label({self.parent.name},
             {','.join([f' {k}= "{v}"' for k, v in self.conf.options.items()])})"""
         return statement
