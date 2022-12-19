@@ -1,6 +1,6 @@
 import tkinter
 
-from autoTK.w_canvas import WCanvas, WTypes
+from autoTK.widgets.w_canvas import WCanvas, WTypes
 
 
 class WOval(WCanvas):
