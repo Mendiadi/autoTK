@@ -18,7 +18,7 @@ class Parent:
 
 class Placer:
     def __init__(self, root):
-        self.handler = None
+        self.handlers = {}
         self.root = root
         self.root.bind('<Motion>', self.motion)
         self.root.bind("<ButtonPress-1>", lambda event: self.capture(True))
@@ -52,22 +52,22 @@ class Placer:
             parent__ = Parent(self.root, "self.win")
         return parent__
 
-    def add_handler(self,func):
-
-        self.handlers = func
+    def add_handler(self,name,func):
+        if name not in self.handlers:
+            self.handlers[name] = func
 
     def add_widget(self, widget:WBase, name, parent=None):
         parent__ = self.config_parent(parent)
         if name in self.widgets:
             name = f"{name}_{self.amounts}"
         new_widget = widget.create_widget(name,parent__,self.set_choosen)
-
         new_widget.update()
 
-        self.choosen_name = new_widget.name
         self.widgets[new_widget.name] = new_widget
+        self.set_choosen(new_widget)
         new_widget.index = self.amounts
         self.amounts += 1
+
 
     def update_widget(self,value):
         w = self.widgets[self.choosen_name]
@@ -81,11 +81,16 @@ class Placer:
 
 
     def set_choosen(self, wid):
+        if not wid:
+            self.choosen = None
+            self.choosen_name = None
+            return
         if not self.in_multiple_selection:
             self.force_select = True
             self.choosen = wid.widget
             self.choosen_name = wid.name
             self.memorize_detect.clear()
+            self.handlers["select"](wid)
         else:
             self.selected_multi_list.add(wid)
 
@@ -112,8 +117,7 @@ class Placer:
             print(first_wid.name,self.widgets,"^"*100)
         else:
             first_wid = None
-        self.choosen = first_wid.widget
-        self.choosen_name = first_wid.name if first_wid else None
+        self.set_choosen(first_wid)
 
     def motion(self, event):
 
@@ -131,7 +135,7 @@ class Placer:
                 if not self.selected_multi_list:
                     return
         if self.handlers and self.choosen:
-            self.handlers(self.get_widget(self.choosen_name))
+            self.handlers["update"](self.get_widget(self.choosen_name))
         print(self.handlers)
 
 
@@ -209,12 +213,13 @@ class Placer:
     def duplicate(self):
         temp = self.choosen_name
         name = self.choosen_name + str(self.amounts)
-        print(self.widgets[self.choosen_name].type,"@"*100)
-        self.add_widget(type(self.widgets[self.choosen_name]),
-                        name,self.widgets[self.choosen_name].parent.replace("self.",""))
-        self.widgets[name].set_conf(**self.widgets[temp].conf.options)
-        print(self.widgets[name].__dict__, "*" * 200)
-        self.widgets[name].update()
+        w = self.widgets[self.choosen_name]
+        self.add_widget(type(w),
+                        name,w.parent.name.replace("self.",""))
+        new_w = self.get_widget(name)
+        new_w.set_conf(**self.widgets[temp].conf.options)
+        new_w.update()
+        self.handlers["select"](new_w)
 
     def capture(self, flag):
         self.do_capture = flag

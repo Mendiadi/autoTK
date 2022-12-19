@@ -132,7 +132,7 @@ class TopBar:
                                                        offvalue=0, onvalue=1,
                                                        bg="lightblue", border=0, activebackground="lightblue",
                                                        command=self.onclick_check_button)
-        self.multi_selected_check_btn.place(x=500, y=90)
+        # self.multi_selected_check_btn.place(x=500, y=90)
         self.enable_auto_correct_check_btn.place(x=50, y=90)
 
         self.set_y_entry.place(x=400, y=130)
@@ -183,6 +183,7 @@ class TopBar:
         temp = dict(widget.conf.options)
         for option, value in temp.items():
             e = self.options_entries[option]
+            e.delete(0,tk.END)
             e.insert(0, value)
         x, y =widget.widget.winfo_x(),widget.widget.winfo_y()
         self.set_x_entry.delete(0,tk.END)
@@ -219,6 +220,13 @@ class TopBar:
 
         self.editor.placer.is_auto_correct_enabled = bool(self.enable_auto_correct_check_var.get())
 
+    # def multi_select_check_btn(self):
+    #     if self.top_bar.multi_selected_var.get() == 1:
+    #         self.handle_multiple_selection()
+    #     else:
+    #         self.list_box_multi.place_forget()
+    #         self.placer.in_multiple_selection = False
+
 class RenderEditor(Screen):
     def __init__(self, win, gui, height, width):
         super().__init__(win, gui)
@@ -231,7 +239,9 @@ class RenderEditor(Screen):
 
         self.second_win.pack_propagate(False)
         self.placer = Placer(self.second_win)
-        self.placer.add_handler(self.top_bar.update)
+        self.placer.add_handler("update",self.top_bar.update)
+        self.placer.add_handler("select",self.select_widget)
+
         # widgets layer
 
         self.w_btns_widgets = []
@@ -276,7 +286,7 @@ class RenderEditor(Screen):
         self.top_bar.show()
         self.second_win.pack(pady=50)
         self.active = True
-        threading.Thread(target=self._thread_update_chosen, daemon=True).start()
+
         self.in_updating_options = False
         self.temp_values = None
         print(self.w_btns_widgets)
@@ -294,6 +304,9 @@ class RenderEditor(Screen):
         self.list_box.selection_clear(0, tk.END)
         self.list_box.select_set(wid.index)
         self.list_box.select_anchor(wid.index)
+        self.top_bar.generate_content(wid)
+        self.top_bar.update(wid)
+
         print(wid.__dict__, "&"*100)
 
     def handle_multiple_selection(self):
@@ -308,50 +321,6 @@ class RenderEditor(Screen):
             for i, w in enumerate(self.temp_multi_selection):
                 content = f"\n{w.name} type {type(w.widget).__name__}"
                 self.list_box_multi.insert(i, content)
-
-    def _thread_update_chosen(self):
-        pos = ""
-        while self.active:
-            time.sleep(0.5)
-            if self.top_bar.multi_selected_var.get() == 1:
-                self.handle_multiple_selection()
-            else:
-
-                self.list_box_multi.place_forget()
-                self.placer.in_multiple_selection = False
-
-                selected = self.list_box.get(tk.ANCHOR)
-                wid = self.placer.get_widget(self.placer.choosen_name)
-                if self.placer.choosen is None and self.placer.choosen_name is None:
-                    ...
-                    continue
-                else:
-                    ...
-                if not selected:
-                    if not wid:
-                        continue
-                    self.select_widget(wid)
-                    self.top_bar.generate_content(wid)
-                    self.top_bar.update(wid)
-                    continue
-
-                if self.placer.choosen_name != selected:
-                    if not self.placer.force_select:
-                        print("moshe")
-                        self.placer.choosen_name = selected
-                        self.placer.choosen = self.placer.get_widget(selected).widget
-                        self.top_bar.update(wid)
-
-
-                        pos = f"   (x = {self.placer.choosen.winfo_x()},y = {self.placer.choosen.winfo_y()})"
-
-                    else:
-                        self.select_widget(wid)
-                        self.top_bar.generate_content(wid)
-                        self.top_bar.update(wid)
-                print(selected,self.placer.choosen_name)
-                if pos:
-                    pos = f"   (x = {self.placer.choosen.winfo_x()},y = {self.placer.choosen.winfo_y()})"
 
 
 

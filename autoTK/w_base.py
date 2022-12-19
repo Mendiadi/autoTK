@@ -18,6 +18,7 @@ class WBase:
         self.widget = None
         self.parent = parent
         self.supported = None
+        self.index = 0
 
     def init(self):...
 
