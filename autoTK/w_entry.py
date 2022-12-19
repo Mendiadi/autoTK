@@ -7,7 +7,8 @@ class WEntry(WBase):
     def __init__(self, name, parent):
         super().__init__(name, parent)
         self.conf = None
-        self.supported = ( "bg", "width", "border", "font")
+        self.supported = ("bg", "width", "border", "font")
+
     def init(self):
         self.widget = tkinter.Entry(self.parent.parent)
         self.set_conf()

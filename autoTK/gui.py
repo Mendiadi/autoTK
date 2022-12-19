@@ -3,7 +3,6 @@ import time
 import tkinter as tk
 import functools
 
-
 from autoTK.options import Options
 from autoTK.w_button import WButton
 from autoTK.w_canvas import WCanvas
@@ -91,17 +90,18 @@ class StartScreen(Screen):
         self.entry_name.pack_forget()
         self.entry_name.pack_forget()
 
+
 class TopBar:
-    def __init__(self,root,editor):
+    def __init__(self, root, editor):
         self.labels_supported = {}
         self.editor = editor
         self.root = root
         self.top_bar = tk.Canvas(self.root, height=170, width=600, bg="lightblue")
-        self.txt_choosen_name = tk.Label(self.top_bar,font="none 15 bold",bg="lightblue")
-        self.txt_choosen_pos = tk.Label(self.top_bar,font="none 15 bold",bg="lightblue")
+        self.txt_choosen_name = tk.Label(self.top_bar, font="none 15 bold", bg="lightblue")
+        self.txt_choosen_pos = tk.Label(self.top_bar, font="none 15 bold", bg="lightblue")
         self.options_entries = {}
-        self.set_x_entry = tk.Entry(self.top_bar, width=4, bg="lightblue",font="none 8 bold")
-        self.set_y_entry = tk.Entry(self.top_bar, width=4, bg="lightblue",font="none 8 bold")
+        self.set_x_entry = tk.Entry(self.top_bar, width=4, bg="lightblue", font="none 8 bold")
+        self.set_y_entry = tk.Entry(self.top_bar, width=4, bg="lightblue", font="none 8 bold")
         self.set_y_entry.bind("<Leave>", lambda x: self.editor.placer.choosen.place(y=int(self.set_y_entry.get())))
         self.set_x_entry.bind("<Leave>", lambda x: self.editor.placer.choosen.place(x=int(self.set_x_entry.get())))
         self.duplicate_btn = tk.Button(self.top_bar, text="clone", command=self.editor.duplicate_widget)
@@ -122,42 +122,41 @@ class TopBar:
                                                        bg="lightblue", border=0, activebackground="lightblue",
                                                        command=self.onclick_check_button)
 
-        self.change_name_var_entry = tk.Entry(self.top_bar,width=10,bg="lightblue",font="none 8 bold")
-        self.change_name_var_entry.bind("<Leave>",lambda x: self.change_var_name())
+        self.change_name_var_entry = tk.Entry(self.top_bar, width=10, bg="lightblue", font="none 8 bold")
+        self.change_name_var_entry.bind("<Leave>", lambda x: self.change_var_name())
         self.top_bar.pack()
         self.hide()
 
     def change_var_name(self):
         name = self.editor.placer.choosen_name
-        txt = self.change_name_var_entry.get().replace(" ","_")
+        txt = self.change_name_var_entry.get().replace(" ", "_")
 
         if txt and txt != " " and txt[0].isalpha() and txt not in self.editor.placer.widgets:
 
-
-            wid = self.editor.placer.widgets.pop(name,None)
+            wid = self.editor.placer.widgets.pop(name, None)
             if not wid:
                 return
 
-            wid.name =  txt
+            wid.name = txt
             self.editor.placer.widgets[txt] = wid
-            self.editor.list_box.delete(wid.index,wid.index)
-            self.editor.list_box.insert(wid.index,txt)
-            self.change_name_var_entry.delete(0,tk.END)
+            self.editor.list_box.delete(wid.index, wid.index)
+            self.editor.list_box.insert(wid.index, txt)
+            self.change_name_var_entry.delete(0, tk.END)
             self.change_name_var_entry.insert(0, wid.name)
             self.editor.placer.set_choosen(wid)
 
-    def generate_content(self,options):
+    def generate_content(self, options):
         if self.options_entries:
             [e.destroy() for e in self.options_entries.values()]
             [e.destroy() for e in self.labels_supported.values()]
             self.options_entries.clear()
         for i, supported in enumerate(options.supported):
-            l=tk.Label(self.top_bar, text=supported, bg="lightblue", font="none 12 bold")
+            l = tk.Label(self.top_bar, text=supported, bg="lightblue", font="none 12 bold")
 
             e = tk.Entry(self.top_bar, width=10, bg="deepskyblue", border=0, font="none 10 bold")
             if options.type.value == WTypes.OVAL.value:
 
-                update_fn = lambda x:self.editor.placer.update_widget(e.get())
+                update_fn = lambda x: self.editor.placer.update_widget(e.get())
             else:
                 update_fn = functools.partial(self.update_widget_options, supported=supported, entry=e)
             if options.type.value == WTypes.BUTTON.value:
@@ -166,7 +165,7 @@ class TopBar:
                     self.add_onclick_template_btn.select()
                 else:
                     self.add_onclick_template_btn.deselect()
-                self.add_onclick_template_btn.place(x=10,y=130)
+                self.add_onclick_template_btn.place(x=10, y=130)
             else:
                 self.add_onclick_template_btn.place_forget()
             e.bind("<Leave>", update_fn)
@@ -176,7 +175,6 @@ class TopBar:
             self.options_entries[supported] = e
             self.labels_supported[supported] = l
 
-
     def show(self):
         self.top_bar.config(height=170)
         self.txt_choosen_pos.place(x=440, y=150)
@@ -185,7 +183,6 @@ class TopBar:
         self.set_y_entry.place(x=567, y=155)
         self.enable_auto_correct_check_btn.place(x=50, y=90)
         self.change_name_var_entry.place(x=88, y=155)
-
 
     def hide(self):
         self.txt_choosen_pos.place_forget()
@@ -197,26 +194,24 @@ class TopBar:
 
         self.top_bar.config(height=10)
 
-
-
-    def update(self,widget:WBase):
+    def update(self, widget: WBase):
         if self.editor.in_updating_options:
             return
 
         temp = dict(widget.conf.options)
         for option, value in temp.items():
             e = self.options_entries[option]
-            e.delete(0,tk.END)
+            e.delete(0, tk.END)
             e.insert(0, value)
-        x, y =widget.widget.winfo_x(),widget.widget.winfo_y()
-        self.set_x_entry.delete(0,tk.END)
+        x, y = widget.widget.winfo_x(), widget.widget.winfo_y()
+        self.set_x_entry.delete(0, tk.END)
         self.set_y_entry.delete(0, tk.END)
-        self.set_x_entry.insert(0,x)
-        self.set_y_entry.insert(0,y)
-        self.change_name_var_entry.delete(0,tk.END)
-        self.change_name_var_entry.insert(0,self.editor.placer.choosen_name)
+        self.set_x_entry.insert(0, x)
+        self.set_y_entry.insert(0, y)
+        self.change_name_var_entry.delete(0, tk.END)
+        self.change_name_var_entry.insert(0, self.editor.placer.choosen_name)
         self.txt_choosen_name.config(text=f"Variable:            "
-             f"Type: {type(self.editor.placer.choosen).__name__}")
+                                          f"Type: {type(self.editor.placer.choosen).__name__}")
         self.txt_choosen_pos.config(text="( X =     ,  Y =     )")
 
     def update_widget_options(self, e, entry, supported):
@@ -242,16 +237,16 @@ class RenderEditor(Screen):
         super().__init__(win, gui)
         # master window
         self.win = win
-        self.top_bar = TopBar(self.win,self)
+        self.top_bar = TopBar(self.win, self)
         # actual rendering window
 
         self.second_win = tk.Frame(self.win, height=height, width=width, bg="white")
 
         self.second_win.pack_propagate(False)
         self.placer = Placer(self.second_win)
-        self.placer.add_handler("update",self.top_bar.update)
-        self.placer.add_handler("select",self.select_widget)
-        self.placer.add_handler("top_bar",self.handle_top_bar)
+        self.placer.add_handler("update", self.top_bar.update)
+        self.placer.add_handler("select", self.select_widget)
+        self.placer.add_handler("top_bar", self.handle_top_bar)
 
         # widgets layer
 
@@ -271,9 +266,9 @@ class RenderEditor(Screen):
         self.w_label = tk.Button(self.w_canvas, text="label", command=lambda: self.add(WLabel),
                                  border=0, bg="lightgreen")
         self.w_canvas_create = tk.Button(self.w_canvas, text="canvas", command=lambda: self.add(WCanvas),
-                                 border=0, bg="lightgreen")
+                                         border=0, bg="lightgreen")
         self.w_oval = tk.Button(self.w_canvas, text="oval", command=lambda: self.add(WOval),
-                                 border=0, bg="lightgreen")
+                                border=0, bg="lightgreen")
         self.w_name_label = tk.Label(self.w_canvas, text="Variable: ", bg="red", font="none 10 bold")
         self.w_canvas.pack()
         self.w_label_canvas.pack()
@@ -297,11 +292,9 @@ class RenderEditor(Screen):
 
         self.second_win.pack(pady=50)
         self.active = True
-        self.list_box.bind("<Motion>",lambda x:self.handle_choose_from_list_box())
+        self.list_box.bind("<Motion>", lambda x: self.handle_choose_from_list_box())
         self.in_updating_options = False
         self.temp_values = None
-
-
 
     def handle_top_bar(self):
         if self.placer.choosen_name:
@@ -320,8 +313,6 @@ class RenderEditor(Screen):
                 self.top_bar.generate_content(wid)
                 self.top_bar.update(wid)
 
-
-
     def select_widget(self, wid):
         if not wid:
             return
@@ -330,7 +321,6 @@ class RenderEditor(Screen):
         self.list_box.select_anchor(wid.index)
         self.top_bar.generate_content(wid)
         self.top_bar.update(wid)
-
 
     def duplicate_widget(self):
         self.placer.duplicate()
@@ -355,13 +345,11 @@ class RenderEditor(Screen):
         self.w_btn.place(x=70, y=20)
         self.w_label.place(x=20, y=20)
         self.w_entry.place(x=120, y=20)
-        self.w_oval.place(x=220,y=20)
-        self.w_canvas_create.place(x=160,y=20)
+        self.w_oval.place(x=220, y=20)
+        self.w_canvas_create.place(x=160, y=20)
         self.w_name_label.place(x=0, y=0)
         self.w_entry_name.place(x=70, y=0)
         self.w_entry_set_parent.place(y=0, x=210)
-
-
 
     def hide_widgets_layer(self, e):
         self.w_label_canvas.config(width=1, height=1)

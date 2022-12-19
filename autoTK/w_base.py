@@ -20,17 +20,14 @@ class WBase:
         self.supported = None
         self.index = 0
 
-    def init(self):...
+    def init(self): ...
 
     def update(self):
-
         if self.conf._args_supported(self.conf.options):
             self.widget.config(**self.conf.options)
 
-
     def set_conf(self, **options):
-
-        self.conf = Options(self.supported,**options)
+        self.conf = Options(self.supported, **options)
 
     def generate_code_for_widget(self):
         ...

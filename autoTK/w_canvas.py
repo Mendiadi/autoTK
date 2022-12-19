@@ -7,7 +7,7 @@ class WCanvas(WBase):
     def __init__(self, name, parent):
         super().__init__(name, parent)
         self.conf = None
-        self.supported = ( "bg", "width", "height", "border")
+        self.supported = ("bg", "width", "height", "border")
 
     def init(self):
         self.widget = tkinter.Canvas(self.parent.parent)

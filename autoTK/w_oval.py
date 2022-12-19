@@ -8,8 +8,7 @@ class WOval(WCanvas):
         super().__init__(name, parent)
         self.conf = None
         self.bg = None
-        self.supported = (*self.supported,"inner color")
-
+        self.supported = (*self.supported, "inner color")
 
     def init(self):
         self.widget = tkinter.Canvas(self.parent.parent)
@@ -26,7 +25,6 @@ class WOval(WCanvas):
         if not self.bg:
             self.bg = self.conf.options.pop("bg", 0)
         super().update()
-
 
     def generate_code_for_widget(self) -> str:
         statement = \

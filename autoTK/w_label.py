@@ -8,7 +8,7 @@ class WLabel(WBase):
     def __init__(self, name, parent):
         super().__init__(name, parent)
         self.conf = None
-        self.supported = ("text","bg","width","height","border","font")
+        self.supported = ("text", "bg", "width", "height", "border", "font")
 
     def init(self):
         self.widget = tkinter.Label(self.parent.parent)
