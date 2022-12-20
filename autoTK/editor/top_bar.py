@@ -69,7 +69,7 @@ class TopBar:
             else:
                 update_fn = functools.partial(self.update_widget_options, supported=supported, entry=e)
             print(supported)
-            if options.type.value == WTypes.BUTTON.value:
+            if options.type.value == WTypes.BUTTON.value or options.type.value == WTypes.CHECKBUTTON.value:
 
                 if options.onclick_template:
                     self.add_onclick_template_btn.select()

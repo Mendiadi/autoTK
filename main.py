@@ -7,5 +7,9 @@ from autoTK.gui import GUI
 
 
 root = tk.Tk()
-gui = GUI(root)
+GUI(root)
 root.mainloop()
+
+
+
+

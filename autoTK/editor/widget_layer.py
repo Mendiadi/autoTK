@@ -3,6 +3,7 @@ import tkinter as tk
 
 from autoTK.widgets.w_button import WButton
 from autoTK.widgets.w_canvas import WCanvas
+from autoTK.widgets.w_check_button import WCheckButton
 from autoTK.widgets.w_entry import WEntry
 from autoTK.widgets.w_label import WLabel
 from autoTK.widgets.w_oval import WOval
@@ -31,6 +32,9 @@ class WidgetLayer:
                                          border=0, bg="lightgreen")
         self.w_oval = tk.Button(self.w_canvas, text="oval", command=lambda: self.editor.add(WOval),
                                 border=0, bg="lightgreen")
+        self.w_checkbutton = tk.Button(self.w_canvas, text="checkbutton",
+                                       command=lambda: self.editor.add(WCheckButton),
+                                border=0, bg="lightgreen")
         self.w_name_label = tk.Label(self.w_canvas, text="Variable: ", bg="red", font="none 10 bold")
         self.w_canvas.pack()
         self.w_label_canvas.pack()
@@ -46,6 +50,7 @@ class WidgetLayer:
         self.w_label.place(x=20, y=20)
         self.w_entry.place(x=120, y=20)
         self.w_oval.place(x=220, y=20)
+        self.w_checkbutton.place(x=260,y=20)
         self.w_canvas_create.place(x=160, y=20)
         self.w_name_label.place(x=0, y=0)
         self.w_entry_name.place(x=70, y=0)
@@ -64,3 +69,4 @@ class WidgetLayer:
         self.w_entry.place_forget()
         self.w_entry_set_parent.place_forget()
         self.w_oval.place_forget()
+        self.w_checkbutton.place_forget()
