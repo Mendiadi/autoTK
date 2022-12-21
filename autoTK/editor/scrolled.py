@@ -33,6 +33,5 @@ class ScrolledWin:
         # configure the canvas
         self.my_canvas.configure(yscrollcommand=self.my_scrollbar.set)
         self.my_canvas.bind('<Configure>', lambda e: self.update_win())
-        frame = tk.Frame(self.my_canvas,height=self.h,width=self.w-10)
-        frame.pack(pady=50)
-        return frame
+
+        return self.my_canvas

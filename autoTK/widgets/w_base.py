@@ -29,7 +29,11 @@ class WBase:
             self.widget.config(**self.conf.options)
 
     def set_conf(self, **options):
+
         self.conf = Options(self.supported, **options)
+
+
+        self.conf.options.update(**options)
 
     def generate_code_for_widget(self):
         ...

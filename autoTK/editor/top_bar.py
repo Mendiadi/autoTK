@@ -1,3 +1,4 @@
+import tkinter
 import tkinter as tk
 import functools
 
@@ -53,21 +54,32 @@ class TopBar:
             self.editor.placer.set_choosen(wid)
 
     def generate_content(self, options):
+        from tkinter import font
         if self.options_entries:
             [e.destroy() for e in self.options_entries.values()]
             [e.destroy() for e in self.labels_supported.values()]
             self.options_entries.clear()
         i2 = 0
         for i, supported in enumerate(options.supported):
-
+            if supported == "font":
+                continue
             l = tk.Label(self.top_bar, text=supported, bg="lightblue", font="none 12 bold")
+            if supported == "font type":
+                e = tk.Listbox(self.top_bar,height=4,bd=1)
+                for i, f in enumerate(font.families()):
+                    e.insert(i, f)
 
-            e = tk.Entry(self.top_bar, width=10, bg="deepskyblue", border=0, font="none 10 bold")
+
+                # e.bind("<Enter>", lambda x: print(e.selection_get()))
+
+            else:
+                e = tk.Entry(self.top_bar, width=10, bg="deepskyblue", border=0, font="none 10 bold")
             if options.type.value == WTypes.OVAL.value:
 
                 update_fn = lambda x: self.editor.placer.update_widget(e.get())
             else:
-                update_fn = functools.partial(self.update_widget_options, supported=supported, entry=e)
+                update_fn = functools.partial(self.update_widget_options, supported=supported, entry=e,
+                                              key="font type" if supported == "font type" else None)
             print(supported)
             if options.type.value == WTypes.BUTTON.value or options.type.value == WTypes.CHECKBUTTON.value:
 
@@ -116,9 +128,20 @@ class TopBar:
 
         temp = dict(widget.conf.options)
         for option, value in temp.items():
-            e = self.options_entries[option]
-            e.delete(0, tk.END)
-            e.insert(0, value)
+            e = self.options_entries.get(option,None)
+            if not e:
+                continue
+
+            else:
+                e.delete(0, tk.END)
+                e.insert(0, value)
+        font_conf = ("","font size","font style")
+        for i,f in enumerate(widget.conf._font):
+            if i == 0:
+                continue
+            e = self.options_entries[font_conf[i]]
+            e.delete(0,tk.END)
+            e.insert(0,f)
         x, y = widget.widget.winfo_x(), widget.widget.winfo_y()
         self.set_x_entry.delete(0, tk.END)
         self.set_y_entry.delete(0, tk.END)
@@ -130,12 +153,26 @@ class TopBar:
                                           f"Type: {type(self.editor.placer.choosen).__name__}")
         self.txt_choosen_pos.config(text="( X =     ,  Y =     )")
 
-    def update_widget_options(self, e, entry, supported):
+    def update_widget_options(self, e, entry, supported,key=None):
+        from tkinter import font
         if self.editor.placer.amounts < 1:
             return
         self.editor.in_updating_options = True
         wid = self.editor.placer.get_widget(self.editor.placer.choosen_name)
-        wid.conf.options[supported] = entry.get()
+        print(entry, supported, key)
+        if key:
+            print(entry,supported,key)
+            try:
+                if entry.selection_get() in font.families():
+                    wid.conf.options[supported] = entry.selection_get()
+            except tkinter.TclError:
+                pass
+
+
+            self.editor.in_updating_options = False
+        else:
+            wid.conf.options[supported] = entry.get()
+        wid.conf.update_font()
         wid.update()
         self.editor.in_updating_options = False
 

@@ -10,8 +10,8 @@ class WLabel(WBase):
         self.conf = None
         self.supported = (
             "text", "bg", "width",
-            "height", "border", "font",
-            "fg"
+            "height", "border",
+            "fg","font style","font size","font type","font"
         )
 
     def init(self):
@@ -24,7 +24,18 @@ class WLabel(WBase):
         return WTypes.LABEL
 
     def generate_code_for_widget(self) -> str:
+        l = []
+        f_style = self.conf.options.pop("font style", 0)
+        f_size = self.conf.options.pop("font size", 0)
+        for k, v in self.conf.options.items():
+
+            if k == "font":
+                v1 = f"(\"{v}\", {f_size},\"{f_style}\")"
+                l.append(f' {k}= {v1}')
+            else:
+                l.append(f' {k}= "{v}"')
+
         statement = \
             f"""self.{self.name} = tk.Label({self.parent.name},
-            {','.join([f' {k}= "{v}"' for k, v in self.conf.options.items()])})"""
+            {','.join(l)})"""
         return statement

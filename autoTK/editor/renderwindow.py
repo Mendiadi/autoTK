@@ -204,6 +204,7 @@ class RenderWindow:
                         name, w.parent.name.replace("self.", ""))
         new_w = self.get_widget(name)
         new_w.set_conf(**self.widgets[temp].conf.options)
+        new_w.conf._font = w.conf._font
         new_w.update()
         self.handlers["select"](new_w)
 
