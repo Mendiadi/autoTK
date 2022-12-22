@@ -135,13 +135,16 @@ class TopBar:
             else:
                 e.delete(0, tk.END)
                 e.insert(0, value)
-        font_conf = ("","font size","font style")
-        for i,f in enumerate(widget.conf._font):
-            if i == 0:
-                continue
-            e = self.options_entries[font_conf[i]]
-            e.delete(0,tk.END)
-            e.insert(0,f)
+        if "font" in widget.supported:
+
+            font_conf = ("","font size","font style")
+            for i,f in enumerate(widget.conf._font):
+                if i == 0:
+                    continue
+
+                e = self.options_entries[font_conf[i]]
+                e.delete(0,tk.END)
+                e.insert(0,f)
         x, y = widget.widget.winfo_x(), widget.widget.winfo_y()
         self.set_x_entry.delete(0, tk.END)
         self.set_y_entry.delete(0, tk.END)
@@ -168,11 +171,11 @@ class TopBar:
             except tkinter.TclError:
                 pass
 
-
+            wid.conf.update_font()
             self.editor.in_updating_options = False
         else:
             wid.conf.options[supported] = entry.get()
-        wid.conf.update_font()
+
         wid.update()
         self.editor.in_updating_options = False
 
