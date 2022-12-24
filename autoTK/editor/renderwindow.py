@@ -71,16 +71,19 @@ class RenderWindow:
         new_widget.index = self.amounts
         self.amounts += 1
 
-    def update_widget(self,e, value):
+    def update_widget(self,e, value,h=None,w_=None):
         w = self.widgets[self.choosen_name]
         if not value():
             return
         if w.type.value == WTypes.OVAL.value:
             w.bg = value()
-            self.choosen.create_oval(0, 0,
-                                     w.conf.options['width'],
-                                     w.conf.options['height'],
-                                     fill=w.bg)
+            print(h,w_)
+
+            self.choosen.delete(w.shape)
+            w.shape = self.choosen.create_oval(0, 0,
+                                     w_ if w_ else w.conf.options['width'],
+                                     h if h else w.conf.options['height'],
+                                     fill=w.bg,tags=("oval",))
         if w.type.value == WTypes.LABEL.value or w.type.value == WTypes.BUTTON.value:
             #todo fix images
             op = w.conf.options.get("image",None)

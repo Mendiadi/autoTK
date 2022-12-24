@@ -74,7 +74,7 @@ class TopBar:
 
             else:
                 e = tk.Entry(self.top_bar, width=10, bg="deepskyblue", border=0, font="none 10 bold")
-            if options.type.value == WTypes.OVAL.value:
+            if options.type.value == WTypes.OVAL.value and supported == "inner color":
 
                 update_fn = lambda x: self.editor.placer.update_widget(x,e.get)
 
@@ -169,6 +169,7 @@ class TopBar:
         self.editor.in_updating_options = True
         wid = self.editor.placer.get_widget(self.editor.placer.choosen_name)
         op = wid.conf.options.get(supported,None)
+
         if op:
             if op == entry.get():
                 print("not need to update")
@@ -188,6 +189,12 @@ class TopBar:
             wid.conf.options[supported] = entry.get()
         if "font" in wid.supported:
             wid.conf.update_font()
+        if wid.type.value == WTypes.OVAL.value:
+            def help():
+                return wid.bg
+            self.editor.placer.update_widget(entry,help,h=wid.conf.options["height"]
+                                             , w_=wid.conf.options["width"])
+            print("moshe")
         wid.update()
         self.editor.in_updating_options = False
 

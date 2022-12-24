@@ -73,11 +73,11 @@ class RenderEditor(Screen):
                                     bg = "lightblue", font = "none 10 bold",
                                    border = 0, activebackground = "lightgreen",
         )
-        self.duplicate_btn.place(x=770, y=80)
+        self.duplicate_btn.place(x=10, y=180)
         self.button_del_wid = tk.Button(self.win, text="DELETE",bg="lightblue",font="none 10 bold",
                                         border=0,activebackground="lightgreen",
                                         command=lambda: self.placer.delete_selected(self.list_box))
-        self.button_del_wid.place(x=770, y=50)
+        self.button_del_wid.place(x=10, y=220)
         # tools
 
 

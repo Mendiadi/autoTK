@@ -1,8 +1,7 @@
-# Import the required libraries
 import tkinter
 from tkinter import *
 
-# Create an instance of tkinter frame or window
+
 win = Tk()
 
 # Set the size of the window
@@ -14,20 +13,29 @@ win.geometry("700x350")
 
 # Add items in the Listbox
 
-
-# Add a Button To Edit and Delete the Listbox Item
-# a = tkinter.PhotoImage(file="D:\\autoTK\\resources\\bg.png")
-# l = Button(win, text="Save",image= a
-# )
-#
-# l.pack()
+flag = True
+l = Canvas(win,bg="red",height=100,width=100
+)
+oval = l.create_oval(0,0,100,100,fill="green")
 
 
-import tkinter
-#
-# a = input("enter")
-# with open("test.txt","w",encoding="utf-8") as f:
-#     f.write(a)
-#
-# print(a)
+def do():
+    global flag,oval
+    if flag:
+        l.delete(oval)
+        oval  = l.create_oval(0, 0, 50, 50, fill="blue")
+    else:
+        l.delete(oval)
+        oval = l.create_oval(0, 0, 100, 100, fill="green")
+    flag = not flag
+
+
+
+btn = tkinter.Button(win,text="ckick",command=do)
+btn.pack()
+l.pack()
+win.mainloop()
+
+
+
 
