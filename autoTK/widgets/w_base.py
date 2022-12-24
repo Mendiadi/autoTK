@@ -1,5 +1,7 @@
 from enum import Enum
 
+from typing_extensions import overload
+
 from autoTK.utils.options import Options
 
 
@@ -22,6 +24,10 @@ class WBase:
         self.index = 0
 
     def init(self): ...
+
+    def update_widget_option(self,value,supported):
+        ...
+
 
     def update(self):
         if self.conf._args_supported(self.conf.options):

@@ -167,8 +167,8 @@ class TopBar:
             return
 
         self.editor.in_updating_options = True
-        wid = self.editor.placer.get_widget(self.editor.placer.choosen_name)
-        op = wid.conf.options.get(supported,None)
+        wid: WBase = self.editor.placer.get_widget(self.editor.placer.choosen_name)
+        op = wid.conf.options.get(supported, None)
 
         if op:
             if op == entry.get():
@@ -176,26 +176,16 @@ class TopBar:
                 return
         print(entry, supported, key)
         if key:
-            print(entry,supported,key)
+            print(entry, supported, key)
             try:
                 if entry.selection_get() in font.families():
-                    wid.conf.options[supported] = entry.selection_get()
+                    value = entry.selection_get()
             except tkinter.TclError:
-                pass
+                return
 
-
-            self.editor.in_updating_options = False
         else:
-            wid.conf.options[supported] = entry.get()
-        if "font" in wid.supported:
-            wid.conf.update_font()
-        if wid.type.value == WTypes.OVAL.value:
-            def help():
-                return wid.bg
-            self.editor.placer.update_widget(entry,help,h=wid.conf.options["height"]
-                                             , w_=wid.conf.options["width"])
-            print("moshe")
-        wid.update()
+            value = entry.get()
+        wid.update_widget_option(value, supported)
         self.editor.in_updating_options = False
 
     def onclick_check_button(self):

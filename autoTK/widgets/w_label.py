@@ -1,5 +1,7 @@
 import tkinter
 
+import tkinter as tk
+
 from autoTK.widgets.w_base import WBase, WTypes
 
 
@@ -15,6 +17,13 @@ class WLabel(WBase):
         )
 
 
+    def update_widget_option(self,value,supported):
+        self.conf.options[supported] = value
+        if supported == "image":
+            img = tk.PhotoImage(file=value(), name=value())
+            self.set_conf(image=img)
+        self.conf.update_font()
+        self.update()
 
     def init(self):
         self.widget = tkinter.Label(self.parent.parent)

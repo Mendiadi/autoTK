@@ -23,6 +23,11 @@ class WCheckButton(WBase):
     def type(self):
         return WTypes.CHECKBUTTON
 
+    def update_widget_option(self,value,supported):
+        self.conf.options[supported] = value
+        self.conf.update_font()
+        self.update()
+
     def generate_code_for_widget(self) -> str:
 
         if self.onclick_template:

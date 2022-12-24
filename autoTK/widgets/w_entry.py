@@ -1,5 +1,7 @@
 import tkinter
 
+from typing_extensions import overload
+
 from autoTK.widgets.w_base import WBase, WTypes
 
 
@@ -13,6 +15,13 @@ class WEntry(WBase):
         self.widget = tkinter.Entry(self.parent.parent)
         self.set_conf()
         self.widget.pack()
+
+
+
+    def update_widget_option(self,value,supported):
+        self.conf.options[supported] = value
+        self.conf.update_font()
+        self.update()
 
     @property
     def type(self):

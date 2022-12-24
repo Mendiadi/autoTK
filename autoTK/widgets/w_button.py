@@ -1,4 +1,5 @@
 import tkinter
+import tkinter as tk
 
 from autoTK.widgets.w_base import WBase, WTypes
 
@@ -24,6 +25,13 @@ class WButton(WBase):
     def type(self):
         return WTypes.BUTTON
 
+    def update_widget_option(self,value,supported):
+        self.conf.options[supported] = value
+        if supported == "image":
+            img = tk.PhotoImage(file=value(), name=value())
+            self.set_conf(image=img)
+        self.conf.update_font()
+        self.update()
 
 
     def generate_code_for_widget(self) -> str:

@@ -15,6 +15,11 @@ class WCanvas(WBase):
         self.widget.pack()
         self.set_conf(height=50,width=50)
 
+    def update_widget_option(self,value,supported):
+        self.conf.options[supported] = value
+
+        self.update()
+
     @property
     def type(self):
         return WTypes.CANVAS
