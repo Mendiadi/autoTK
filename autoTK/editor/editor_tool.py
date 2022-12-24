@@ -64,7 +64,9 @@ class RenderEditor(Screen):
                                            font="none 10 bold")
         self.label_project_name.place(x=0,y=0)
         # list box
-        self.list_box = tk.Listbox(self.win,bg="lightblue",font="none 10 bold")
+        self.list_box_headline = tk.Label(self.win,text="Widgets:",font="none 15 bold",bg="lightblue")
+        self.list_box_headline.place(x=10,y=250)
+        self.list_box = tk.Listbox(self.win,bg="lightblue",font="none 12 bold")
         self.list_box.place(x=10, y=300)
         self.list_box_multi = tk.Listbox(self.win, bg="lightblue", height=9, font="none 10 bold")
         self.duplicate_btn = tk.Button(self.win, text="clone", command=self.duplicate_widget,

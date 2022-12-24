@@ -12,7 +12,7 @@ class WOval(WCanvas):
 
     def init(self):
         self.widget = tkinter.Canvas(self.parent.parent)
-        self.set_conf(width=100, height=100, bg="red")
+        self.set_conf(width=50, height=50, bg="red")
         self.widget.create_oval(0, 0, self.conf.options['width'], self.conf.options['height'],
                                 fill=self.conf.options['bg'])
         self.widget.pack()
