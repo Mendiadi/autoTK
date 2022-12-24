@@ -71,14 +71,28 @@ class RenderWindow:
         new_widget.index = self.amounts
         self.amounts += 1
 
-    def update_widget(self, value):
+    def update_widget(self,e, value):
         w = self.widgets[self.choosen_name]
+        if not value():
+            return
         if w.type.value == WTypes.OVAL.value:
-            w.bg = value
+            w.bg = value()
             self.choosen.create_oval(0, 0,
                                      w.conf.options['width'],
                                      w.conf.options['height'],
                                      fill=w.bg)
+        if w.type.value == WTypes.LABEL.value or w.type.value == WTypes.BUTTON.value:
+            #todo fix images
+            op = w.conf.options.get("image",None)
+            print(value(),str(op),type(op),type(value()),"*"*100)
+            if op:
+                if str(op) == value():
+                    print("not need to update")
+                    return
+            img = tk.PhotoImage(file=value(),name=value())
+            w.set_conf(image=img)
+
+            w.update()
 
     def set_choosen(self, wid):
         if not wid:
@@ -204,7 +218,7 @@ class RenderWindow:
                         name, w.parent.name.replace("self.", ""))
         new_w = self.get_widget(name)
         new_w.set_conf(**self.widgets[temp].conf.options)
-        new_w.conf._font = w.conf._font
+        new_w.conf._font = list(w.conf._font)
         new_w.update()
         self.handlers["select"](new_w)
 

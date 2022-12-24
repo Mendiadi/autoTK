@@ -24,8 +24,7 @@ class WCheckButton(WBase):
         return WTypes.CHECKBUTTON
 
     def generate_code_for_widget(self) -> str:
-        f_style = self.conf.options.pop("font style",0)
-        f_size = self.conf.options.pop("font size",0)
+
         if self.onclick_template:
             self.conf.options["command"] = f"self.{self.name}_onclick"
 
@@ -33,7 +32,7 @@ class WCheckButton(WBase):
         for k, v in self.conf.options.items():
             if k != "command":
                 if k == "font":
-                    v1 = f"(\"{v}\", {f_size},\"{f_style}\")"
+                    v1 = f"(\"{self.conf._font[0]}\", {self.conf._font[1]},\"{self.conf._font[2]}\")"
                     l.append(f' {k}= {v1}')
                 else:
                     l.append(f' {k}= "{v}"')

@@ -27,7 +27,7 @@ class Provider:
     def _prepare_file(self):
         if self.structure.name not in os.listdir():
             path = os.path.join(self.dir, self.structure.name + "_" + ".py")
-            with open(path, "w") as f:
+            with open(path, "w",encoding="utf-8") as f:
                 attrs = self.w_statements.generate_definition()
                 states = self.w_statements.generate_placing()
                 content = self.structure.create_structure(attrs, states)

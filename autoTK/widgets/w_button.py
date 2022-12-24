@@ -10,9 +10,10 @@ class WButton(WBase):
         self.onclick_template = False
         self.supported = (
             "text", "bg", "width",
-            "height", "border","font style","font size",
+            "height", "border","image","font style","font size",
             "fg","state","font type","font"
         )
+
 
     def init(self):
         self.widget = tkinter.Button(self.parent.parent)
@@ -23,16 +24,21 @@ class WButton(WBase):
     def type(self):
         return WTypes.BUTTON
 
+
+
     def generate_code_for_widget(self) -> str:
         if self.onclick_template:
             self.conf.options["command"] = f"self.{self.name}_onclick"
-        f_style = self.conf.options.pop("font style", 0)
-        f_size = self.conf.options.pop("font size", 0)
+        image_statement = ""
         l = []
         for k,v in self.conf.options.items():
             if k != "command":
+                if k == "image":
+                    l.append(f' {k}= self.{self.name + "_image"}')
+                    image_statement = f"self.{self.name + '_image'} = tk.PhotoImage(file=r\"{v}\")\n\t\t"
+                    continue
                 if k == "font":
-                    v1 = f"(\"{v}\", {f_size},\"{f_style}\")"
+                    v1 = f"(\"{self.conf._font[0]}\", {self.conf._font[1]},\"{self.conf._font[2]}\")"
                     l.append(f' {k}= {v1}')
                 else:
                     l.append(f' {k}= "{v}"')
@@ -41,6 +47,6 @@ class WButton(WBase):
                 l.append(f' {k}= {v}')
 
         statement = \
-            f"""self.{self.name} = tk.Button({self.parent.name},
+            f"""{image_statement}self.{self.name} = tk.Button({self.parent.name},
             {','.join(l)})"""
         return statement

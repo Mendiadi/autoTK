@@ -65,7 +65,7 @@ class TopBar:
                 continue
             l = tk.Label(self.top_bar, text=supported, bg="lightblue", font="none 12 bold")
             if supported == "font type":
-                e = tk.Listbox(self.top_bar,height=4,bd=1)
+                e = tk.Listbox(self.top_bar,height=4,bd=1,bg="lightblue")
                 for i, f in enumerate(font.families()):
                     e.insert(i, f)
 
@@ -76,10 +76,15 @@ class TopBar:
                 e = tk.Entry(self.top_bar, width=10, bg="deepskyblue", border=0, font="none 10 bold")
             if options.type.value == WTypes.OVAL.value:
 
-                update_fn = lambda x: self.editor.placer.update_widget(e.get())
+                update_fn = lambda x: self.editor.placer.update_widget(x,e.get)
+
             else:
-                update_fn = functools.partial(self.update_widget_options, supported=supported, entry=e,
+                if supported == "image":
+                    update_fn = functools.partial(self.editor.placer.update_widget,value=e.get)
+                else:
+                    update_fn = functools.partial(self.update_widget_options, supported=supported, entry=e,
                                               key="font type" if supported == "font type" else None)
+
             print(supported)
             if options.type.value == WTypes.BUTTON.value or options.type.value == WTypes.CHECKBUTTON.value:
 
@@ -160,8 +165,14 @@ class TopBar:
         from tkinter import font
         if self.editor.placer.amounts < 1:
             return
+
         self.editor.in_updating_options = True
         wid = self.editor.placer.get_widget(self.editor.placer.choosen_name)
+        op = wid.conf.options.get(supported,None)
+        if op:
+            if op == entry.get():
+                print("not need to update")
+                return
         print(entry, supported, key)
         if key:
             print(entry,supported,key)
@@ -171,11 +182,12 @@ class TopBar:
             except tkinter.TclError:
                 pass
 
-            wid.conf.update_font()
+
             self.editor.in_updating_options = False
         else:
             wid.conf.options[supported] = entry.get()
-
+        if "font" in wid.supported:
+            wid.conf.update_font()
         wid.update()
         self.editor.in_updating_options = False
 
