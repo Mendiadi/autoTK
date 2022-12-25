@@ -1,3 +1,5 @@
+import copy
+import tkinter
 from enum import Enum
 
 from typing_extensions import overload
@@ -32,17 +34,23 @@ class WBase:
     def update(self):
         if self.conf._args_supported(self.conf.options):
             print(self.conf.options)
+
             self.widget.config(**self.conf.options)
 
     def set_conf(self, **options):
 
-        self.conf = Options(self.supported, **options)
+        if not self.conf:
+            self.conf = Options(self.supported, **options)
+        else:
 
-
-        self.conf.options.update(**options)
+            self.conf.options.update(**options)
 
     def generate_code_for_widget(self):
         ...
+
+
+
+
 
     @classmethod
     def create_widget(cls, name, parent, func):

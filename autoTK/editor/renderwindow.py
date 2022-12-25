@@ -38,6 +38,8 @@ class RenderWindow:
         self.selected_multi_list = set()
         self.is_auto_correct_enabled = False
 
+
+
     def get_widget(self, name):
         wid = self.widgets.get(name, None)
         return wid
@@ -92,8 +94,11 @@ class RenderWindow:
                 if str(op) == value():
                     print("not need to update")
                     return
-            img = tk.PhotoImage(file=value(),name=value())
-            w.set_conf(image=img)
+            try:
+                img = tk.PhotoImage(file=value(),name=value())
+                w.set_conf(image=img)
+            except tk.TclError:
+                pass
 
             w.update()
 
@@ -107,6 +112,7 @@ class RenderWindow:
             self.choosen_name = wid.name
             self.memorize_detect.clear()
             self.handlers["select"](wid)
+
         self.handlers["top_bar"]()
 
     def delete_selected(self, list_box):
@@ -225,9 +231,25 @@ class RenderWindow:
         new_w.update()
         self.handlers["select"](new_w)
 
+    def redo(self,name, x, y,conf):
+        w = self.get_widget(name)
+        if not w:
+            return
+
+        w.conf = conf
+        w.update()
+        print(w.conf.__dict__)
+        if name != self.choosen_name:
+            self.set_choosen(w)
+        self.choosen.place_configure(x=x,y=y)
+
+
     def capture(self, flag):
         self.do_capture = flag
         if not flag:
             self.force_select = False
-
+        else:
+            func = self.handlers.get("redo",0)
+            if func:
+                func()
         self.in_motion = False

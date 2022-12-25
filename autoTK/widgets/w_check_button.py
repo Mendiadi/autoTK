@@ -17,7 +17,7 @@ class WCheckButton(WBase):
     def init(self):
         self.widget = tkinter.Checkbutton(self.parent.parent)
         self.widget.pack()
-        self.set_conf(text="sample")
+        self.set_conf(text="sample",bg="white",onvalue=1,offvalue=0,border=1,fg="black")
 
     @property
     def type(self):

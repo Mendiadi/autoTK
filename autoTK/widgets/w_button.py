@@ -19,7 +19,7 @@ class WButton(WBase):
     def init(self):
         self.widget = tkinter.Button(self.parent.parent)
         self.widget.pack()
-        self.set_conf(text="sample")
+        self.set_conf(text="sample",bg="white",border=1,fg="black")
 
     @property
     def type(self):

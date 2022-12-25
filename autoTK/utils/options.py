@@ -1,3 +1,6 @@
+import copy
+
+
 class Options:
 
     def __init__(self, supported, **kwargs):
@@ -20,6 +23,11 @@ class Options:
         self._font[0] = font
         self._options["font"] =tuple(self._font)
         print(self.options['font'])
+
+    def copy(self):
+        x = Options(self._supported_args,**self.options)
+        x._font = self._font
+        return x
 
     @property
     def supported(self):

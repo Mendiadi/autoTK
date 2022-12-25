@@ -28,7 +28,7 @@ class WLabel(WBase):
     def init(self):
         self.widget = tkinter.Label(self.parent.parent)
         self.widget.pack()
-        self.set_conf(text="sample")
+        self.set_conf(text="sample",fg="black",border=1,bg="white")
 
     @property
     def type(self):

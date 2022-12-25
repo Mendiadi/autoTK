@@ -13,7 +13,7 @@ class WEntry(WBase):
 
     def init(self):
         self.widget = tkinter.Entry(self.parent.parent)
-        self.set_conf()
+        self.set_conf(bg="white")
         self.widget.pack()
 
 
