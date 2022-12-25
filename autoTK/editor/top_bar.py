@@ -38,6 +38,8 @@ class TopBar:
         self.hide()
         self.last_moves = []
 
+        self.font_style_var =None
+
     def fit_theme(self):
         self.top_bar.config(bg=self.editor.components.theme)
         self.txt_choosen_name.config(bg=self.editor.components.theme)
@@ -66,8 +68,6 @@ class TopBar:
             self.change_name_var_entry.insert(0, wid.name)
             self.editor.placer.set_choosen(wid)
 
-
-
     def generate_content(self, options):
         from tkinter import font
         if self.options_entries:
@@ -76,13 +76,20 @@ class TopBar:
             self.options_entries.clear()
         i2 = 0
         for i, supported in enumerate(options.supported):
+
+
             if supported == "font":
+
                 continue
             l = tk.Label(self.top_bar, text=supported, bg=self.editor.components.theme, font="none 12 bold")
             if supported == "font type":
                 e = tk.Listbox(self.top_bar,height=4,bd=1,bg=self.editor.components.theme)
                 for i, f in enumerate(font.families()):
                     e.insert(i, f)
+            elif supported == "font style":
+                    self.font_style_var, e = self.editor.components.create_radio_buttons(
+                    self.top_bar,("normal","bold","italic","italic bold"),bg=self.editor.components.theme
+                )
             else:
                 e = tk.Entry(self.top_bar, width=10, bg=self.editor.components.sub, border=0, font="none 10 bold")
             if options.type.value == WTypes.OVAL.value and supported == "inner color":
@@ -160,10 +167,12 @@ class TopBar:
             for i,f in enumerate(widget.conf._font):
                 if i == 0:
                     continue
-
-                e = self.options_entries[font_conf[i]]
-                e.delete(0,tk.END)
-                e.insert(0,f)
+                if i == 2:
+                    self.font_style_var.set(f)
+                else:
+                    e = self.options_entries[font_conf[i]]
+                    e.delete(0,tk.END)
+                    e.insert(0,f)
         self.update_position(widget)
         self.change_name_var_entry.delete(0, tk.END)
         self.change_name_var_entry.insert(0, self.editor.placer.choosen_name)
@@ -204,7 +213,10 @@ class TopBar:
                 return
 
         else:
-            value = entry.get()
+            if supported != "font style":
+                value = entry.get()
+            else:
+                value = self.font_style_var.get()
         if not value:
             return
         wid.update_widget_option(value, supported)

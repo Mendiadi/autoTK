@@ -1,5 +1,6 @@
+import functools
 import tkinter as tk
-from typing import Callable
+from typing import Callable, Sequence
 
 
 class WAutoTK:
@@ -47,3 +48,37 @@ class WAutoTK:
             c.config(bg=self.theme,font=self.font)
 
 
+    def create_radio_buttons(self,master,modes:Sequence,**kwargs):
+        if not modes:
+            return
+        if type(modes[0]) == str:
+            var = tk.StringVar()
+        else:
+            var = tk.IntVar()
+        can = tk.Canvas(master,bg=self.theme)
+        command = kwargs.pop("command", None)
+
+        for mode in modes:
+            if command:
+
+                f=functools.partial(command,value=mode)
+            else:
+                f= None
+            a = tk.Radiobutton(can,text=mode,value=mode,variable=var,command=f)
+            a.config(**kwargs)
+            a.pack()
+        var.set(modes[0])
+        return var, can
+
+def click(value):
+    print(value)
+
+if __name__ == '__main__':
+    a = WAutoTK()
+    win = tk.Tk()
+    win.geometry("500x500")
+    l = ["option1","option2","option3"]
+    var , can =a.create_radio_buttons(win,l,command=click)
+    can.pack()
+    print(var.get())
+    win.mainloop()

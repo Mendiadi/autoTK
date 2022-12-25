@@ -10,8 +10,8 @@ class WCheckButton(WBase):
         self.onclick_template = False
         self.supported = (
             "text", "bg", "width",
-            "height", "border","font style","font size",
-            "fg","state","onvalue","offvalue","font type","font"
+            "height", "border","font size",
+            "fg","state","onvalue","font style","offvalue","font type","font"
         )
 
     def init(self):

@@ -11,8 +11,8 @@ class WButton(WBase):
         self.onclick_template = False
         self.supported = (
             "text", "bg", "width",
-            "height", "border","image","font style","font size",
-            "fg","state","font type","font"
+            "height", "border","image","font size",
+            "fg","state","font style","font type","font"
         )
 
 

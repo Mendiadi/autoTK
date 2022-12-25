@@ -13,7 +13,7 @@ class WLabel(WBase):
         self.supported = (
             "text", "bg", "width",
             "height", "border",
-            "fg","image","font style","font size","font type","font"
+            "fg","image","font size","font type","font style","font"
         )
 
 

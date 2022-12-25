@@ -9,7 +9,7 @@ class WEntry(WBase):
     def __init__(self, name, parent):
         super().__init__(name, parent)
         self.conf = None
-        self.supported = ("bg", "width", "border","fg","font style","font size", "font type","font")
+        self.supported = ("bg", "width", "border","fg","font size","font style", "font type","font")
 
     def init(self):
         self.widget = tkinter.Entry(self.parent.parent)
