@@ -231,7 +231,7 @@ class RenderWindow:
         new_w.update()
         self.handlers["select"](new_w)
 
-    def redo(self,name, x, y,conf):
+    def undo(self, name, x, y, conf):
         w = self.get_widget(name)
         if not w:
             return

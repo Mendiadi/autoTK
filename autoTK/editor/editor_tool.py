@@ -85,8 +85,8 @@ class RenderEditor(Screen):
                 command=lambda: self.placer.delete_selected(self.list_box),activebackground =self.components.sub)
         self.button_del_wid.place(x=10, y=220)
         # tools
-        self.back_btn =  self.components.create_button(self.win,text="Redo",
-                command=self.redo,activebackground =self.components.sub)
+        self.back_btn =  self.components.create_button(self.win, text="Undo",
+                                                       command=self.undo, activebackground =self.components.sub)
         self.back_btn.place(x=75,y=180)
         self.active = True
         self.list_box.bind("<Motion>", lambda x: self.handle_choose_from_list_box())
@@ -113,18 +113,18 @@ class RenderEditor(Screen):
 
 
 
-    def redo(self):
+    def undo(self):
         if not self.last_moves or not self.placer.choosen:
             return
         name,c,x,y = self.last_moves.pop()
         print(c,x,y)
-        self.placer.redo(name,x, y,c)
+        self.placer.undo(name, x, y, c)
         self.top_bar.update(self.placer.get_widget(self.placer.choosen_name))
 
     def update_last_moves(self):
         widget = self.placer.get_widget(self.placer.choosen_name)
         if len(self.last_moves) > 10:
-            self.last_moves.pop()
+            self.last_moves.pop(0)
 
         self.last_moves.append((widget.name,widget.conf.copy(),widget.widget.winfo_x(),widget.widget.winfo_y()))
         print(self.last_moves)

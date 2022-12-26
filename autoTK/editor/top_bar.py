@@ -1,3 +1,4 @@
+import time
 import tkinter
 import tkinter as tk
 import functools
@@ -11,7 +12,7 @@ class TopBar:
         self.labels_supported = {}
         self.editor = editor
         self.root = root
-        self.top_bar = tk.Canvas(self.root, height=170, width=600, bg=self.editor.components.theme)
+        self.top_bar = tk.Canvas(self.root, height=190, width=600, bg=self.editor.components.theme)
         self.txt_choosen_name = tk.Label(self.top_bar, font="none 15 bold", bg=self.editor.components.theme)
         self.txt_choosen_pos = tk.Label(self.top_bar, font="none 15 bold", bg=self.editor.components.theme
                                         ,text="( X =     ,  Y =     )")
@@ -70,11 +71,13 @@ class TopBar:
 
     def generate_content(self, options):
         from tkinter import font
+
         if self.options_entries:
             [e.destroy() for e in self.options_entries.values()]
             [e.destroy() for e in self.labels_supported.values()]
             self.options_entries.clear()
         i2 = 0
+
         for i, supported in enumerate(options.supported):
 
 
@@ -126,13 +129,13 @@ class TopBar:
             self.labels_supported[supported] = l
 
     def show(self):
-        self.top_bar.config(height=170)
-        self.txt_choosen_pos.place(x=440, y=150)
-        self.txt_choosen_name.place(x=0, y=150)
-        self.set_x_entry.place(x=490, y=155)
-        self.set_y_entry.place(x=567, y=155)
+        self.top_bar.config(height=190)
+        self.txt_choosen_pos.place(x=440, y=160)
+        self.txt_choosen_name.place(x=0, y=160)
+        self.set_x_entry.place(x=490, y=160)
+        self.set_y_entry.place(x=567, y=160)
 
-        self.change_name_var_entry.place(x=88, y=155)
+        self.change_name_var_entry.place(x=88, y=165)
 
     def hide(self):
         self.txt_choosen_pos.place_forget()
@@ -143,15 +146,14 @@ class TopBar:
         self.txt_choosen_pos.place_forget()
         self.change_name_var_entry.place_forget()
 
-        self.top_bar.config(height=10)
+        self.top_bar.config(height=5)
 
 
 
 
     def update(self, widget: WBase):
-        if self.editor.in_updating_options:
-            return
 
+        print(f"[LOG] {self.editor.placer.choosen_name},{widget.name},{widget.conf.options}")
         temp = dict(widget.conf.options)
         for option, value in temp.items():
             e = self.options_entries.get(option,None)
@@ -173,7 +175,9 @@ class TopBar:
                     e = self.options_entries[font_conf[i]]
                     e.delete(0,tk.END)
                     e.insert(0,f)
+        print(f"[LOG1] {self.editor.placer.choosen_name},{widget.name},{widget.conf.options}")
         self.update_position(widget)
+
         self.change_name_var_entry.delete(0, tk.END)
         self.change_name_var_entry.insert(0, self.editor.placer.choosen_name)
         self.txt_choosen_name.config(text=f"Variable:            "
@@ -192,7 +196,7 @@ class TopBar:
         from tkinter import font
         if self.editor.placer.amounts < 1:
             return
-
+        print(f"[LOG3] {self.editor.placer.choosen_name},{supported}")
         self.editor.in_updating_options = True
         wid: WBase = self.editor.placer.get_widget(self.editor.placer.choosen_name)
         op = wid.conf.options.get(supported, None)
