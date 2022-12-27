@@ -1,8 +1,7 @@
-import time
+
 import tkinter
 import tkinter as tk
 import functools
-
 
 from autoTK.widgets.w_base import WTypes, WBase
 
@@ -15,17 +14,15 @@ class TopBar:
         self.top_bar = tk.Canvas(self.root, height=190, width=600, bg=self.editor.components.theme)
         self.txt_choosen_name = tk.Label(self.top_bar, font="none 15 bold", bg=self.editor.components.theme)
         self.txt_choosen_pos = tk.Label(self.top_bar, font="none 15 bold", bg=self.editor.components.theme
-                                        ,text="( X =     ,  Y =     )")
+                                        , text="( X =     ,  Y =     )")
         self.options_entries = {}
         self.set_x_entry = tk.Entry(self.top_bar, width=4, bg=self.editor.components.theme, font="none 8 bold")
         self.set_y_entry = tk.Entry(self.top_bar, width=4, bg=self.editor.components.theme, font="none 8 bold")
         self.set_y_entry.bind("<Leave>", lambda x: self.editor.placer.choosen.place(y=int(self.set_y_entry.get())))
         self.set_x_entry.bind("<Leave>", lambda x: self.editor.placer.choosen.place(x=int(self.set_x_entry.get())))
 
-
-
         self.add_onclick_template_var = tk.IntVar()
-        self.add_onclick_template_btn = tk.Checkbutton(self.top_bar,font="none 10 bold",
+        self.add_onclick_template_btn = tk.Checkbutton(self.top_bar, font="none 10 bold",
                                                        text="Add onclick Template",
                                                        variable=self.add_onclick_template_var,
                                                        offvalue=0, onvalue=1,
@@ -39,7 +36,7 @@ class TopBar:
         self.hide()
         self.last_moves = []
 
-        self.font_style_var =None
+        self.font_style_var = None
 
     def fit_theme(self):
         self.top_bar.config(bg=self.editor.components.theme)
@@ -51,6 +48,7 @@ class TopBar:
         w = self.editor.placer.get_widget(self.editor.placer.choosen_name)
         self.generate_content(w)
         self.update(w)
+
     def change_var_name(self):
         name = self.editor.placer.choosen_name
         txt = self.change_name_var_entry.get().replace(" ", "_")
@@ -80,31 +78,29 @@ class TopBar:
 
         for i, supported in enumerate(options.supported):
 
-
             if supported == "font":
-
                 continue
             l = tk.Label(self.top_bar, text=supported, bg=self.editor.components.theme, font="none 12 bold")
             if supported == "font type":
-                e = tk.Listbox(self.top_bar,height=4,bd=1,bg=self.editor.components.theme)
+                e = tk.Listbox(self.top_bar, height=4, bd=1, bg=self.editor.components.theme)
                 for i, f in enumerate(font.families()):
                     e.insert(i, f)
             elif supported == "font style":
-                    self.font_style_var, e = self.editor.components.create_radio_buttons(
-                    self.top_bar,("normal","bold","italic","italic bold"),bg=self.editor.components.theme
+                self.font_style_var, e = self.editor.components.create_radio_buttons(
+                    self.top_bar, ("normal", "bold", "italic", "italic bold"), bg=self.editor.components.theme
                 )
             else:
                 e = tk.Entry(self.top_bar, width=10, bg=self.editor.components.sub, border=0, font="none 10 bold")
             if options.type.value == WTypes.OVAL.value and supported == "inner color":
 
-                update_fn = lambda x: self.editor.placer.update_widget(x,e.get)
+                update_fn = lambda x: self.editor.placer.update_widget(x, e.get)
 
             else:
                 if supported == "image":
-                    update_fn = functools.partial(self.editor.placer.update_widget,value=e.get)
+                    update_fn = functools.partial(self.editor.placer.update_widget, value=e.get)
                 else:
                     update_fn = functools.partial(self.update_widget_options, supported=supported, entry=e,
-                                              key="font type" if supported == "font type" else None)
+                                                  key="font type" if supported == "font type" else None)
 
             print(supported)
             if options.type.value == WTypes.BUTTON.value or options.type.value == WTypes.CHECKBUTTON.value:
@@ -148,15 +144,12 @@ class TopBar:
 
         self.top_bar.config(height=5)
 
-
-
-
     def update(self, widget: WBase):
 
         print(f"[LOG] {self.editor.placer.choosen_name},{widget.name},{widget.conf.options}")
         temp = dict(widget.conf.options)
         for option, value in temp.items():
-            e = self.options_entries.get(option,None)
+            e = self.options_entries.get(option, None)
             if not e:
                 continue
 
@@ -165,16 +158,16 @@ class TopBar:
                 e.insert(0, value)
         if "font" in widget.supported:
 
-            font_conf = ("","font size","font style")
-            for i,f in enumerate(widget.conf._font):
+            font_conf = ("", "font size", "font style")
+            for i, f in enumerate(widget.conf._font):
                 if i == 0:
                     continue
                 if i == 2:
                     self.font_style_var.set(f)
                 else:
                     e = self.options_entries[font_conf[i]]
-                    e.delete(0,tk.END)
-                    e.insert(0,f)
+                    e.delete(0, tk.END)
+                    e.insert(0, f)
         print(f"[LOG1] {self.editor.placer.choosen_name},{widget.name},{widget.conf.options}")
         self.update_position(widget)
 
@@ -183,16 +176,14 @@ class TopBar:
         self.txt_choosen_name.config(text=f"Variable:            "
                                           f"Type: {type(self.editor.placer.choosen).__name__}")
 
-
-    def update_position(self,widget):
+    def update_position(self, widget):
         x, y = widget.widget.winfo_x(), widget.widget.winfo_y()
         self.set_x_entry.delete(0, tk.END)
         self.set_y_entry.delete(0, tk.END)
         self.set_x_entry.insert(0, x)
         self.set_y_entry.insert(0, y)
 
-
-    def update_widget_options(self, e, entry, supported,key=None):
+    def update_widget_options(self, e, entry, supported, key=None):
         from tkinter import font
         if self.editor.placer.amounts < 1:
             return
@@ -225,12 +216,7 @@ class TopBar:
             return
         wid.update_widget_option(value, supported)
         self.editor.update_last_moves()
-        self.editor.in_updating_options = False
 
     def onclick_check_button(self):
         w = self.editor.placer.get_widget(self.editor.placer.choosen_name)
         w.onclick_template = bool(self.add_onclick_template_var.get())
-
-
-
-

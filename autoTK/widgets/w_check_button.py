@@ -10,20 +10,20 @@ class WCheckButton(WBase):
         self.onclick_template = False
         self.supported = (
             "text", "bg", "width",
-            "height", "border","font size",
-            "fg","state","onvalue","font style","offvalue","font type","font"
+            "height", "border", "font size",
+            "fg", "state", "onvalue", "font style", "offvalue", "font type", "font"
         )
 
     def init(self):
         self.widget = tkinter.Checkbutton(self.parent.parent)
         self.widget.pack()
-        self.set_conf(text="sample",bg="white",onvalue=1,offvalue=0,border=1,fg="black")
+        self.set_conf(text="sample", bg="white", onvalue=1, offvalue=0, border=1, fg="black")
 
     @property
     def type(self):
         return WTypes.CHECKBUTTON
 
-    def update_widget_option(self,value,supported):
+    def update_widget_option(self, value, supported):
         self.conf.options[supported] = value
         self.conf.update_font()
         self.update()

@@ -1,19 +1,17 @@
 import tkinter
 
-from typing_extensions import overload
-
 from autoTK.widgets.w_base import WBase, WTypes
 
 
-class WEntry(WBase):
+class WTextBox(WBase):
     def __init__(self, name, parent):
         super().__init__(name, parent)
         self.conf = None
-        self.supported = ("bg", "width", "border", "fg", "font size", "font style", "font type", "font")
+        self.supported = ("bg", "width", "height", "border", "font style", "font type", "fg", "font size", "font")
 
     def init(self):
-        self.widget = tkinter.Entry(self.parent.parent)
-        self.set_conf(bg="white")
+        self.widget = tkinter.Text(self.parent.parent)
+        self.set_conf(bg="white", width=10, height=5)
         self.widget.pack()
 
     def update_widget_option(self, value, supported):
@@ -23,7 +21,7 @@ class WEntry(WBase):
 
     @property
     def type(self):
-        return WTypes.ENTRY
+        return WTypes.TEXTBOX
 
     def generate_code_for_widget(self) -> str:
         self.conf.options.pop("text", 0)
@@ -38,6 +36,6 @@ class WEntry(WBase):
                 l.append(f' {k}= "{v}"')
 
         statement = \
-            f"""self.{self.name} = tk.Entry({self.parent.name},
+            f"""self.{self.name} = tk.Text({self.parent.name},
                    {','.join(l)})"""
         return statement

@@ -47,7 +47,7 @@ class StartScreen(Screen):
         line = ""
         for c in "WELCOME TO TKINTER DESIGNER":
 
-            time.sleep(0.2)
+            time.sleep(0.15)
 
             line += c
             self.headline.config(text=line)

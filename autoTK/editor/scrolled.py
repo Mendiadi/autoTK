@@ -1,18 +1,16 @@
 
-
 import tkinter as tk
 
 class ScrolledWin:
-    def __init__(self,win,h,w):
+    def __init__(self ,win ,h ,w):
         self.win = win
-        self.main_frame = tk.Frame(win,bg="red")
+        self.main_frame = tk.Frame(win ,bg="red")
         self.my_canvas = None
         self.h =h
         self.w = w
         self.my_scrollbar = None
 
-
-    def update_win(self,e):
+    def update_win(self, e):
         self.win.update()
         try:
             self.my_canvas.configure(scrollregion=self.my_canvas.bbox("all"))
@@ -21,8 +19,7 @@ class ScrolledWin:
 
     def hook(self):
 
-
-        self.main_frame.pack(expand=1,fill=tk.BOTH)
+        self.main_frame.pack(expand=1, fill=tk.BOTH)
         # canvas
         self.my_canvas = tk.Canvas(self.main_frame)
         self.my_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)

@@ -13,14 +13,14 @@ class WLabel(WBase):
         self.supported = (
             "text", "bg", "width",
             "height", "border",
-            "fg","image","font size","font type","font style","font"
+            "fg", "image", "font size", "font type", "font style", "font"
         )
 
-
-    def update_widget_option(self,value,supported):
+    def update_widget_option(self, value, supported):
         self.conf.options[supported] = value
         if supported == "image":
             img = tk.PhotoImage(file=value(), name=value())
+            self.widget.image = img
             self.set_conf(image=img)
         self.conf.update_font()
         self.update()
@@ -28,7 +28,7 @@ class WLabel(WBase):
     def init(self):
         self.widget = tkinter.Label(self.parent.parent)
         self.widget.pack()
-        self.set_conf(text="sample",fg="black",border=1,bg="white")
+        self.set_conf(text="sample", fg="black", border=1, bg="white")
 
     @property
     def type(self):
