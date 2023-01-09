@@ -1,4 +1,5 @@
 import tkinter
+import tkinter as tk
 
 from autoTK.widgets.w_base import WBase, WTypes
 
@@ -10,28 +11,33 @@ class WButton(WBase):
         self.onclick_template = False
         self.supported = (
             "text", "bg", "width",
-            "height", "border","image","font style","font size",
-            "fg","state","font type","font"
+            "height", "border", "image", "font size",
+            "fg", "state", "font style", "font type", "font"
         )
-
 
     def init(self):
         self.widget = tkinter.Button(self.parent.parent)
         self.widget.pack()
-        self.set_conf(text="sample")
+        self.set_conf(text="sample", bg="white", border=1, fg="black")
 
     @property
     def type(self):
         return WTypes.BUTTON
 
-
+    def update_widget_option(self, value, supported):
+        self.conf.options[supported] = value
+        if supported == "image":
+            img = tk.PhotoImage(file=value(), name=value())
+            self.set_conf(image=img)
+        self.conf.update_font()
+        self.update()
 
     def generate_code_for_widget(self) -> str:
         if self.onclick_template:
             self.conf.options["command"] = f"self.{self.name}_onclick"
         image_statement = ""
         l = []
-        for k,v in self.conf.options.items():
+        for k, v in self.conf.options.items():
             if k != "command":
                 if k == "image":
                     l.append(f' {k}= self.{self.name + "_image"}')

@@ -1,4 +1,5 @@
 import tkinter
+from typing_extensions import overload
 
 from autoTK.widgets.w_canvas import WCanvas, WTypes
 
@@ -10,12 +11,23 @@ class WOval(WCanvas):
         self.bg = None
         self.supported = (*self.supported, "inner color")
         self.shape = None
+
     def init(self):
         self.widget = tkinter.Canvas(self.parent.parent)
         self.set_conf(width=50, height=50, bg="red")
         self.shape = self.widget.create_oval(0, 0, self.conf.options['width'], self.conf.options['height'],
-                                fill=self.conf.options['bg'])
+                                             fill=self.conf.options['bg'])
         self.widget.pack()
+
+    def update_widget_option(self, value, supported):
+        self.conf.options[supported] = value
+        self.widget.delete(self.shape)
+
+        self.shape = self.widget.create_oval(0, 0,
+                                             self.conf.options['width'],
+                                             self.conf.options['height'],
+                                             fill=self.bg, tags=("oval",))
+        self.update()
 
     @property
     def type(self):

@@ -1,3 +1,5 @@
+import threading
+import time
 import tkinter as tk
 
 
@@ -35,11 +37,23 @@ class StartScreen(Screen):
         self.entry_height = tk.Entry(self.canvas, width=10, border=0, bg="deepskyblue2", font="none 10 bold")
         self.label_info_height = tk.Label(self.canvas, text="HEIGHT: ", bg="lightblue")
         self.headline.pack()
-        self.canvas.pack(pady=100)
         self.label_on_canvas.pack(pady=5)
-        self.content_label.pack(pady=5)
+
         self.entry_height.insert(0, "500")
         self.entry_width.insert(0, "500")
+        threading.Thread(target=self._headline_animation,daemon=True).start()
+
+    def _headline_animation(self):
+        line = ""
+        for c in "WELCOME TO TKINTER DESIGNER":
+
+            time.sleep(0.15)
+
+            line += c
+            self.headline.config(text=line)
+
+        self.canvas.pack(pady=80)
+        self.content_label.pack(pady=5)
 
     def _create(self):
         height, width = self.entry_height.get(), self.entry_width.get()

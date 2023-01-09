@@ -2,23 +2,25 @@ import tkinter as tk
 
 import threading
 
-from autoTK.widgets.w_base import WTypes, WBase
+from PIL import Image, ImageTk
 
+from autoTK.widgets.w_base import WTypes, WBase
 
 from autoTK.utils.common_types import Parent
 from autoTK.editor.scrolled import ScrolledWin
 
+
 class RenderWindow:
-    def __init__(self, root,h,w):
+    def __init__(self, root, h, w):
 
         self.hook_scroll = False
         self.handlers = {}
         self.win = root
 
         if self.hook_scroll:
-            self.scrolled = ScrolledWin(root,h,w)
+            self.scrolled = ScrolledWin(root, h, w)
             self.root = self.scrolled.hook()
-            print("*"*100)
+            print("*" * 100)
         else:
             self.root = tk.Frame(self.win, height=h, width=w, bg="white")
             self.root.pack(pady=50)
@@ -41,7 +43,6 @@ class RenderWindow:
     def get_widget(self, name):
         wid = self.widgets.get(name, None)
         return wid
-
 
     def config_parent(self, parent):
         if parent:
@@ -71,29 +72,44 @@ class RenderWindow:
         new_widget.index = self.amounts
         self.amounts += 1
 
-    def update_widget(self,e, value,h=None,w_=None):
+    def update_widget(self, e, value, h=None, w_=None):
         w = self.widgets[self.choosen_name]
         if not value():
             return
         if w.type.value == WTypes.OVAL.value:
             w.bg = value()
-            print(h,w_)
+            print(h, w_)
 
             self.choosen.delete(w.shape)
             w.shape = self.choosen.create_oval(0, 0,
-                                     w_ if w_ else w.conf.options['width'],
-                                     h if h else w.conf.options['height'],
-                                     fill=w.bg,tags=("oval",))
+                                               w_ if w_ else w.conf.options['width'],
+                                               h if h else w.conf.options['height'],
+                                               fill=w.bg, tags=("oval",))
         if w.type.value == WTypes.LABEL.value or w.type.value == WTypes.BUTTON.value:
-            #todo fix images
-            op = w.conf.options.get("image",None)
-            print(value(),str(op),type(op),type(value()),"*"*100)
+            # todo fix images
+            op = w.conf.options.get("image", None)
+            print(value(), str(op), type(op), type(value()), "*" * 100)
             if op:
                 if str(op) == value():
                     print("not need to update")
                     return
-            img = tk.PhotoImage(file=value(),name=value())
-            w.set_conf(image=img)
+            try:
+                path = value()
+                if path.startswith("\""):
+                    path = path[1::]
+                if path.endswith("\""):
+                    path = path[:-1:]
+
+                pic = Image.open(path)
+                if pic.width > self.root.winfo_width():
+                    pic.resize((self.root.winfo_width() // 4, pic.height))
+                if pic.height > self.root.winfo_height():
+                    pic.resize((pic.width, self.root.winfo_height() // 4))
+                img = ImageTk.PhotoImage(file=path, name=value())
+
+                w.set_conf(image=img)
+            except tk.TclError:
+                pass
 
             w.update()
 
@@ -107,6 +123,7 @@ class RenderWindow:
             self.choosen_name = wid.name
             self.memorize_detect.clear()
             self.handlers["select"](wid)
+
         self.handlers["top_bar"]()
 
     def delete_selected(self, list_box):
@@ -141,9 +158,6 @@ class RenderWindow:
 
             if self.handlers and self.choosen:
                 self.handlers["update"](self.get_widget(self.choosen_name))
-
-
-
 
     def detect_vertical_points(self):
         canvases = []
@@ -225,9 +239,24 @@ class RenderWindow:
         new_w.update()
         self.handlers["select"](new_w)
 
+    def undo(self, name, x, y, conf):
+        w = self.get_widget(name)
+        if not w:
+            return
+
+        w.conf = conf
+        w.update()
+        print(w.conf.__dict__)
+        if name != self.choosen_name:
+            self.set_choosen(w)
+        self.choosen.place_configure(x=x, y=y)
+
     def capture(self, flag):
         self.do_capture = flag
         if not flag:
             self.force_select = False
-
+        else:
+            func = self.handlers.get("redo", 0)
+            if func:
+                func()
         self.in_motion = False

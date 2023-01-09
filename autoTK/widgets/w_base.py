@@ -1,9 +1,14 @@
+
+import tkinter
 from enum import Enum
+
+
 
 from autoTK.utils.options import Options
 
 
 class WTypes(Enum):
+    TEXTBOX = 6
     CHECKBUTTON = 5
     OVAL = 4
     CANVAS = 3
@@ -21,19 +26,27 @@ class WBase:
         self.supported = None
         self.index = 0
 
-    def init(self): ...
+    def init(self):
+        ...
+
+    def update_widget_option(self, value, supported):
+        ...
 
     def update(self):
         if self.conf._args_supported(self.conf.options):
             print(self.conf.options)
-            self.widget.config(**self.conf.options)
+            try:
+                self.widget.config(**self.conf.options)
+            except tkinter.TclError as e:
+                print(f"[ERROR] {e}")
 
     def set_conf(self, **options):
 
-        self.conf = Options(self.supported, **options)
+        if not self.conf:
+            self.conf = Options(self.supported, **options)
+        else:
 
-
-        self.conf.options.update(**options)
+            self.conf.options.update(**options)
 
     def generate_code_for_widget(self):
         ...

@@ -13,7 +13,12 @@ class WCanvas(WBase):
         self.widget = tkinter.Canvas(self.parent.parent)
         self.widget.pack_propagate(False)
         self.widget.pack()
-        self.set_conf(height=50,width=50)
+        self.set_conf(height=50, width=50, bg="white", border=1)
+
+    def update_widget_option(self, value, supported):
+        self.conf.options[supported] = value
+
+        self.update()
 
     @property
     def type(self):
